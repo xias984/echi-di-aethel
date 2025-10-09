@@ -10,4 +10,7 @@ RUN apk add --no-cache \
 
 RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
+COPY ssh_setup.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/ssh_setup.sh
+
 WORKDIR /var/www/html
