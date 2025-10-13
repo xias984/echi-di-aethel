@@ -44,7 +44,7 @@ function calculateLevelAndXP($total_xp) {
 
     // Se il livello è il massimo (es. 1000), l'XP richiesto è infinito per bloccare la progressione
     if ($level >= 1000) {
-        $xp_for_next_level = -1; // Flag per max level
+        $xp_for_next_level = -1;
     }
 
     return [
@@ -53,17 +53,12 @@ function calculateLevelAndXP($total_xp) {
         'xp_current_level' => $remaining_xp
     ];
 }
-
 // --- 1. Endpoint: /api/user (POST per creare) ---
 if ($method === 'POST' && count($path_parts) >= 2 && $path_parts[0] === 'api' && $path_parts[1] === 'user') {
     $data = json_decode(file_get_contents("php://input"), true);
     $username = $data['username'] ?? null;
-
-    if (!$username) {
-        http_response_code(400);
-        echo json_encode(["error" => "Il nome utente è richiesto."]);
-        exit;
-    }
+    
+    if (!$username) { http_response_code(400); echo json_encode(["error" => "Il nome utente è richiesto."]); exit; }
 
     try {
         // Avvia transazione per garantire che la creazione e le skill siano atomiche
@@ -90,83 +85,47 @@ if ($method === 'POST' && count($path_parts) >= 2 && $path_parts[0] === 'api' &&
         while (count($bonus_skills) < 3) {
             $rand_skill = $all_skills[array_rand($all_skills)];
             if (!in_array($rand_skill['skill_id'], array_column($bonus_skills, 'skill_id'))) {
-                 // **Logica di Bilanciamento Semplificata**: Qui potremmo aumentare la probabilità
-                 // di selezionare 'Mischia' se i lottatori sono pochi.
-                 // Per ora, solo casualità per la POC (Proof of Concept).
-                $bonus_skills[] = ['skill_id' => $rand_skill['skill_id'], 'xp' => $initial_xp_bonus];
+                $bonus_skills[] = ['skill_id' => $rand_skill['skill_id'], 'xp' => 1500];
             }
         }
 
-        // 4. Assegna tutte le skill base (Livello 1, XP 0)
-        $stmt_skills = $pdo->prepare("
-            INSERT INTO user_skills (user_id, skill_id, current_level, current_xp)
-            VALUES (?, ?, ?, ?)
-        ");
+        $stmt_skills = $pdo->prepare("INSERT INTO user_skills (user_id, skill_id, current_level, current_xp) VALUES (?, ?, ?, ?)");
 
         foreach ($all_skills as $skill) {
             $bonus = 0;
-            $is_talented = false;
             foreach ($bonus_skills as $b) {
-                if ($b['skill_id'] == $skill['skill_id']) {
-                    $bonus = $b['xp'];
-                    $is_talented = true;
-                    break;
-                }
+                if ($b['skill_id'] == $skill['skill_id']) { $bonus = $b['xp']; break; }
             }
-            
-            $initial_level = ($bonus > 0) ? 2 : 1; // Inizia a livello 2 se ha bonus
-            
-            $stmt_skills->execute([
-                $user_id, 
-                $skill['skill_id'], 
-                $initial_level,
-                $bonus
-            ]);
+            $initial_level = ($bonus > 0) ? 2 : 1;
+            $stmt_skills->execute([ $user_id, $skill['skill_id'], $initial_level, $bonus ]);
         }
         
-        // 5. Assegna 1 Tratto Caratteriale Casuale (Tratto Nascosto)
         $random_trait_id = $all_traits[array_rand($all_traits)];
         $stmt_trait = $pdo->prepare("INSERT INTO user_traits (user_id, trait_id) VALUES (?, ?)");
         $stmt_trait->execute([$user_id, $random_trait_id]);
 
         $pdo->commit();
-
         http_response_code(201);
-        echo json_encode([
-            "message" => "Personaggio $username creato con successo! I suoi talenti nascosti sono attivi.", 
-            "user_id" => $user_id
-        ]);
+        echo json_encode(["message" => "Personaggio $username creato con successo! I suoi talenti nascosti sono attivi.", "user_id" => $user_id]);
     } catch (PDOException $e) {
         $pdo->rollBack();
-        if ($e->getCode() == '23505') {
-            http_response_code(409);
-            echo json_encode(["error" => "Nome utente già in uso."]);
-        } else {
-            error_log("DB Error: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(["error" => "Errore di database: " . $e->getMessage()]);
-        }
+        if ($e->getCode() == '23505') { http_response_code(409); echo json_encode(["error" => "Nome utente già in uso."]); } 
+        else { error_log("DB Error: " . $e->getMessage()); http_response_code(500); echo json_encode(["error" => "Errore di database: " . $e->getMessage()]); }
     }
     exit;
 }
 
 // --- 2. Endpoint: /api/user/{user_id}/profile (GET per visualizzare) ---
-if ($method === 'GET' && count($path_parts) >= 3 && $path_parts[0] === 'api' && $path_parts[3] === 'profile') {
+if ($method === 'GET' && count($path_parts) >= 4 && $path_parts[0] === 'api' && $path_parts[1] === 'user' && $path_parts[3] === 'profile') {
     $user_id = (int)$path_parts[2];
 
     try {
-        // 1. Recupera i dati di base dell'utente
         $user_stmt = $pdo->prepare("SELECT username FROM users WHERE user_id = ?");
         $user_stmt->execute([$user_id]);
         $user = $user_stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user) {
-            http_response_code(404);
-            echo json_encode(["error" => "Personaggio non trovato."]);
-            exit;
-        }
+        if (!$user) { http_response_code(404); echo json_encode(["error" => "Personaggio non trovato."]); exit; }
 
-        // 2. Recupera tutte le skill e i livelli
         $skill_stmt = $pdo->prepare("
             SELECT s.name, us.current_level, us.current_xp, s.base_class, s.skill_id
             FROM user_skills us
@@ -177,7 +136,6 @@ if ($method === 'GET' && count($path_parts) >= 3 && $path_parts[0] === 'api' && 
         $skill_stmt->execute([$user_id]);
         $skills = $skill_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 3. Calcola l'XP per il prossimo livello per ogni skill
         foreach ($skills as &$skill) {
             $xp_data = calculateLevelAndXP($skill['current_xp']);
             $skill['current_level'] = $xp_data['level'];
@@ -185,7 +143,6 @@ if ($method === 'GET' && count($path_parts) >= 3 && $path_parts[0] === 'api' && 
             $skill['xp_on_level'] = $xp_data['xp_current_level'];
         }
 
-        // 4. Recupera il tratto caratteriale
         $trait_stmt = $pdo->prepare("
             SELECT t.name, t.description, t.code_modifier 
             FROM user_traits ut
@@ -216,16 +173,11 @@ if ($method === 'POST' && count($path_parts) >= 3 && $path_parts[0] === 'api' &&
     $data = json_decode(file_get_contents("php://input"), true);
     $user_id = (int)($data['user_id'] ?? 0);
     $skill_name = $data['skill_name'] ?? null;
-    $action_time = $data['action_time'] ?? 5; // Tempo di base in secondi (simulato)
+    $action_time = $data['action_time'] ?? 5;
 
-    if (!$user_id || !$skill_name) {
-        http_response_code(400);
-        echo json_encode(["error" => "ID Utente e Nome Abilità sono richiesti."]);
-        exit;
-    }
+    if (!$user_id || !$skill_name) { http_response_code(400); echo json_encode(["error" => "ID Utente e Nome Abilità sono richiesti."]); exit; }
 
     try {
-        // 1. Recupera la skill e il tratto attuale dell'utente
         $skill_data_stmt = $pdo->prepare("
             SELECT us.user_skill_id, us.current_xp, s.skill_id
             FROM user_skills us
@@ -235,11 +187,7 @@ if ($method === 'POST' && count($path_parts) >= 3 && $path_parts[0] === 'api' &&
         $skill_data_stmt->execute([$user_id, $skill_name]);
         $current_skill = $skill_data_stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$current_skill) {
-            http_response_code(404);
-            echo json_encode(["error" => "Abilità non trovata per questo utente."]);
-            exit;
-        }
+        if (!$current_skill) { http_response_code(404); echo json_encode(["error" => "Abilità non trovata per questo utente."]); exit; }
 
         $trait_stmt = $pdo->prepare("
             SELECT t.code_modifier FROM user_traits ut
@@ -250,23 +198,16 @@ if ($method === 'POST' && count($path_parts) >= 3 && $path_parts[0] === 'api' &&
         $trait = $trait_stmt->fetch(PDO::FETCH_ASSOC);
         $trait_modifier = $trait['code_modifier'] ?? null;
         
-        // 2. Logica di Guadagno XP (Variabilità e Casualità)
         $base_xp = 50;
-        $roll = rand(1, 100); // Tiro D100 per l'esito
+        $roll = rand(1, 100);
 
         $result_message = "Successo Base. ";
         $xp_multiplier = 1.0;
 
-        if ($roll > 90) { // Successo Critico (10% di base)
-            $result_message = "Successo Critico! Ottieni un bonus per la qualità.";
-            $xp_multiplier = 2.5;
-        } elseif ($roll < 5) { // Fallimento Critico (5% di base)
-            $result_message = "Fallimento Critico! Tempo sprecato, guadagno XP minimo.";
-            $xp_multiplier = 0.1;
-        }
+        if ($roll > 90) { $result_message = "Successo Critico! Ottieni un bonus per la qualità."; $xp_multiplier = 2.5; } 
+        elseif ($roll < 5) { $result_message = "Fallimento Critico! Tempo sprecato, guadagno XP minimo."; $xp_multiplier = 0.1; }
         
-        // 3. Applicazione Tratto Caratteriale (Esempio: Audace)
-        if ($trait_modifier === 'BONUS_CRIT_RISK_AREA' && $roll > 80) { // Aumenta il critico se Audace
+        if ($trait_modifier === 'BONUS_CRIT_RISK_AREA' && $roll > 80) { 
              $result_message = "Successo Critico (Bonus Tratto Audace)! Massima ricompensa.";
              $xp_multiplier = max($xp_multiplier, 3.0);
         }
@@ -278,7 +219,6 @@ if ($method === 'POST' && count($path_parts) >= 3 && $path_parts[0] === 'api' &&
 
         $level_up = $new_level_data['level'] > $old_level_data['level'];
 
-        // 4. Aggiorna il database
         $update_stmt = $pdo->prepare("
             UPDATE user_skills SET current_xp = ?, current_level = ? 
             WHERE user_skill_id = ?
@@ -289,7 +229,6 @@ if ($method === 'POST' && count($path_parts) >= 3 && $path_parts[0] === 'api' &&
         if ($level_up) {
             $final_message .= " **CONGRATULAZIONI! Sei salito al Livello " . $new_level_data['level'] . "!**";
         }
-
 
         http_response_code(200);
         echo json_encode([
@@ -303,6 +242,174 @@ if ($method === 'POST' && count($path_parts) >= 3 && $path_parts[0] === 'api' &&
         error_log("Action Error: " . $e->getMessage());
         http_response_code(500);
         echo json_encode(["error" => "Errore nell'esecuzione dell'azione."]);
+    }
+    exit;
+}
+
+// --- 4. NUOVO Endpoint: /api/contracts (POST per creare) ---
+if ($method === 'POST' && count($path_parts) >= 2 && $path_parts[0] === 'api' && $path_parts[1] === 'contracts') {
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    $proposer_id = (int)($data['proposer_id'] ?? 0);
+    $title = $data['title'] ?? null;
+    $required_skill_name = $data['required_skill_name'] ?? null;
+    $required_level = (int)($data['required_level'] ?? 1);
+    $reward_amount = (int)($data['reward_amount'] ?? 0);
+
+    if (!$proposer_id || !$title || !$required_skill_name || $reward_amount <= 0) {
+        http_response_code(400);
+        echo json_encode(["error" => "Dati contratto incompleti o ricompensa non valida."]);
+        exit;
+    }
+
+    try {
+        $pdo->beginTransaction();
+
+        // 1. Ottieni l'ID della Skill richiesta
+        $skill_stmt = $pdo->prepare("SELECT skill_id FROM skills WHERE name = ?");
+        $skill_stmt->execute([$required_skill_name]);
+        $required_skill_id = $skill_stmt->fetchColumn();
+
+        if (!$required_skill_id) {
+            $pdo->rollBack();
+            http_response_code(404);
+            echo json_encode(["error" => "Abilità richiesta non valida."]);
+            exit;
+        }
+
+        // 2. Inserisci il Contratto
+        $contract_stmt = $pdo->prepare("
+            INSERT INTO contracts (proposer_id, title, required_skill_id, required_level, reward_amount)
+            VALUES (?, ?, ?, ?, ?) RETURNING contract_id
+        ");
+        $contract_stmt->execute([$proposer_id, $title, $required_skill_id, $required_level, $reward_amount]);
+        $contract_id = $contract_stmt->fetchColumn();
+        
+        // 3. Simula l'Escrow (blocco della ricompensa)
+        $transaction_stmt = $pdo->prepare("
+            INSERT INTO transactions (contract_id, amount, status)
+            VALUES (?, ?, 'PENDING_ESCROW')
+        ");
+        $transaction_stmt->execute([$contract_id, $reward_amount]);
+
+        $pdo->commit();
+
+        http_response_code(201);
+        echo json_encode(["message" => "Contratto pubblicato e ricompensa bloccata (Escrow).", "contract_id" => $contract_id]);
+
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Contract Creation Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(["error" => "Errore di database durante la creazione del contratto."]);
+    }
+    exit;
+}
+
+// --- 5. NUOVO Endpoint: /api/contracts/{user_id} (GET per visualizzare con filtro) ---
+if ($method === 'GET' && count($path_parts) >= 3 && $path_parts[0] === 'api' && $path_parts[1] === 'contracts') {
+    $user_id = (int)($path_parts[2] ?? 0);
+    
+    // Per ottenere tutte le skill dell'utente e i livelli attuali
+    $user_skills_stmt = $pdo->prepare("
+        SELECT skill_id, current_level 
+        FROM user_skills 
+        WHERE user_id = ?
+    ");
+    $user_skills_stmt->execute([$user_id]);
+    $user_skills = $user_skills_stmt->fetchAll(PDO::FETCH_KEY_PAIR); // [skill_id => level]
+
+    // QUERY CRITICA: Seleziona solo i contratti OPEN e che soddisfano il livello minimo dell'utente
+    $query = "
+        SELECT 
+            c.contract_id, c.title, c.reward_amount, c.required_level, c.proposer_id, c.status,
+            s.name AS required_skill_name,
+            u_prop.username AS proposer_name
+        FROM contracts c
+        JOIN skills s ON c.required_skill_id = s.skill_id
+        JOIN users u_prop ON c.proposer_id = u_prop.user_id
+        WHERE c.status = 'OPEN' 
+    ";
+    
+    $where_parts = [];
+    $params = [];
+    
+    // Filtro di visibilità: se l'utente è Loggato, filtra per livello/skill
+    if ($user_id > 0 && !empty($user_skills)) {
+        foreach ($user_skills as $skill_id => $level) {
+            // Include contratti che richiedono questa skill E il cui livello richiesto è <= al livello dell'utente
+            $where_parts[] = "(c.required_skill_id = ? AND c.required_level <= ?)";
+            $params[] = $skill_id;
+            $params[] = $level;
+        }
+    }
+    
+    // Aggiungi un filtro base per includere sempre i contratti per livelli bassi
+    // (Per la POC, non possiamo filtrare la difficoltà, quindi mostriamo solo ciò che è raggiungibile)
+    
+    if (!empty($where_parts)) {
+        $query .= " AND (" . implode(" OR ", $where_parts) . ")";
+    } else {
+        // Se non ci sono skill, mostra solo contratti di Livello 1 (missioni base)
+         $query .= " AND c.required_level = 1";
+    }
+
+    $query .= " ORDER BY c.required_level ASC, c.created_at DESC";
+
+    try {
+        $contracts_stmt = $pdo->prepare($query);
+        $contracts_stmt->execute($params);
+        $contracts = $contracts_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        http_response_code(200);
+        echo json_encode($contracts);
+    } catch (Exception $e) {
+        error_log("Contract List Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(["error" => "Errore nel recupero della bacheca."]);
+    }
+    exit;
+}
+
+// --- 6. NUOVO Endpoint: /api/contracts/{id}/accept (POST per accettare) ---
+if ($method === 'POST' && count($path_parts) >= 4 && $path_parts[1] === 'api' && $path_parts[2] === 'contracts' && $path_parts[4] === 'accept') {
+    $contract_id = (int)$path_parts[3];
+    $data = json_decode(file_get_contents("php://input"), true);
+    $acceptor_id = (int)($data['acceptor_id'] ?? 0);
+
+    if (!$acceptor_id) { http_response_code(400); echo json_encode(["error" => "ID accettante richiesto."]); exit; }
+
+    try {
+        $pdo->beginTransaction();
+        
+        // Verifica lo stato e che non sia stato già accettato
+        $check_stmt = $pdo->prepare("SELECT status FROM contracts WHERE contract_id = ?");
+        $check_stmt->execute([$contract_id]);
+        $status = $check_stmt->fetchColumn();
+
+        if ($status !== 'OPEN') {
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode(["error" => "Il contratto non è disponibile (Stato: $status)."]);
+            exit;
+        }
+
+        // Accetta il contratto
+        $update_stmt = $pdo->prepare("
+            UPDATE contracts SET status = 'ACCEPTED', accepted_by_id = ?, accepted_at = NOW()
+            WHERE contract_id = ?
+        ");
+        $update_stmt->execute([$acceptor_id, $contract_id]);
+
+        $pdo->commit();
+        http_response_code(200);
+        echo json_encode(["message" => "Contratto accettato con successo! Inizia il tuo lavoro."]);
+
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Accept Contract Error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(["error" => "Errore nell'accettazione del contratto."]);
     }
     exit;
 }
