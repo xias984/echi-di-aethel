@@ -1,0 +1,257 @@
+/**
+ * Main CSS File
+ * Imports all CSS modules and provides application-specific styles
+ */
+
+/* Import CSS Modules */
+@import url('./variables.css');
+@import url('./base.css');
+@import url('./components.css');
+@import url('./layout.css');
+
+/* Application-specific styles */
+.app {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+/* Profile Section */
+.profile-section {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-accent);
+}
+
+.profile-name {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.profile-trait {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.trait-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Contract Board */
+.contract-board {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+}
+
+.contract-board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-accent);
+}
+
+.contract-create {
+  background-color: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--color-accent);
+}
+
+.contract-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.contract-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+  .contract-form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Skill List */
+.skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Contract List */
+.contracts-list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: var(--spacing-sm);
+}
+
+.contracts-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.contracts-list::-webkit-scrollbar-track {
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-full);
+}
+
+.contracts-list::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+}
+
+.contracts-list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-light);
+}
+
+/* No Data States */
+.no-contracts,
+.no-skills {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-muted);
+  font-style: italic;
+  background-color: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--color-accent);
+}
+
+/* Loading States */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-muted);
+}
+
+.loading-container .loading-spinner {
+  margin-right: var(--spacing-sm);
+}
+
+/* Error States */
+.error-container {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-error);
+  background-color: var(--color-error-light);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-error);
+}
+
+/* Success States */
+.success-container {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-success-dark);
+  background-color: var(--color-success-light);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-success);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .btn {
+    display: none;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-accent: #000000;
+    --color-text-muted: #000000;
+    --color-text-light: #000000;
+  }
+  
+  .card {
+    border: 2px solid var(--color-text-primary);
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .loading-spinner {
+    animation: none;
+  }
+}

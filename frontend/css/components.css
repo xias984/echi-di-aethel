@@ -1,0 +1,371 @@
+/**
+ * Component Styles
+ * Reusable UI component styles
+ */
+
+/* Container */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+/* Cards */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  transition: box-shadow var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  border-bottom: 1px solid var(--color-accent);
+  padding-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.card-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.card-body {
+  padding: var(--spacing-md) 0;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary-light);
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-surface);
+  border-color: var(--color-secondary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-secondary-light);
+  border-color: var(--color-secondary-light);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.btn-success {
+  background-color: var(--color-success);
+  color: var(--color-surface);
+  border-color: var(--color-success);
+}
+
+.btn-success:hover:not(:disabled) {
+  background-color: var(--color-success-dark);
+  border-color: var(--color-success-dark);
+}
+
+.btn-error {
+  background-color: var(--color-error);
+  color: var(--color-surface);
+  border-color: var(--color-error);
+}
+
+.btn-error:hover:not(:disabled) {
+  background-color: var(--color-error-dark);
+  border-color: var(--color-error-dark);
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
+
+.btn-lg {
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-lg);
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
+}
+
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background-color: var(--color-surface-alt);
+  cursor: not-allowed;
+}
+
+.form-error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+}
+
+/* Messages */
+.message {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  font-weight: var(--font-weight-medium);
+  animation: slideDown var(--transition-normal) ease-out;
+}
+
+.message.success {
+  background-color: var(--color-success-light);
+  color: var(--color-success-dark);
+  border: 1px solid var(--color-success);
+}
+
+.message.error {
+  background-color: var(--color-error-light);
+  color: var(--color-error-dark);
+  border: 1px solid var(--color-error);
+}
+
+.message.default {
+  background-color: var(--color-surface-alt);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-accent);
+}
+
+/* Skill Items */
+.skill-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.skill-item:hover {
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.skill-info {
+  flex-grow: 1;
+  margin-right: var(--spacing-md);
+}
+
+.skill-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.skill-details {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.skill-xp {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+.skill-progress {
+  height: 4px;
+  background-color: var(--color-accent);
+  border-radius: var(--radius-full);
+  margin-top: var(--spacing-xs);
+  overflow: hidden;
+}
+
+.skill-progress-bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+/* Contract Items */
+.contract-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.contract-item:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.contract-details {
+  flex-grow: 1;
+  margin-right: var(--spacing-md);
+}
+
+.contract-title {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.contract-requirement {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-right: var(--spacing-sm);
+}
+
+.contract-proposer {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+.contract-actions {
+  text-align: right;
+  min-width: 120px;
+}
+
+.contract-reward {
+  display: block;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-success);
+  margin-bottom: var(--spacing-xs);
+}
+
+.contract-button {
+  margin-top: var(--spacing-xs);
+}
+
+.contract-owner-btn {
+  background-color: var(--color-primary);
+  color: var(--color-surface);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  cursor: default;
+}
+
+/* Loading States */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-accent);
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .skill-item,
+  .contract-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+  
+  .skill-info,
+  .contract-details {
+    margin-right: 0;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .contract-actions {
+    text-align: left;
+    width: 100%;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
