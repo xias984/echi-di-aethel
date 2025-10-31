@@ -64,6 +64,15 @@ class User extends BaseModel {
     }
     
     /**
+     * Find user by username (for login)
+     */
+    public function findByUsername($username) {
+        $stmt = $this->pdo->prepare("SELECT user_id, username FROM {$this->table} WHERE username = ?");
+        $stmt->execute([$username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    /**
      * Get all skills from database
      */
     private function getAllSkills() {

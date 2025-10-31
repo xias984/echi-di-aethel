@@ -51,5 +51,30 @@ class UserController extends BaseController {
             $this->errorResponse("Internal server error while retrieving profile.", 500);
         }
     }
+
+    /**
+     * Login user by username
+     */
+    public function loginUser() {
+        $data = $this->getJsonInput();
+        $this->validateRequired($data, ['username']);
+        
+        try {
+            $user = $this->userModel->findByUsername($data['username']);
+            
+            if (!$user) {
+                $this->errorResponse("Character not found. Please check the username.", 404);
+            }
+            
+            $this->successResponse(
+                "Welcome back, {$user['username']}!",
+                ['user_id' => $user['user_id'], 'username' => $user['username']],
+                200
+            );
+        } catch (Exception $e) {
+            error_log("Login Error: " . $e->getMessage());
+            $this->errorResponse("Error during login: " . $e->getMessage(), 500);
+        }
+    }
 }
 ?>

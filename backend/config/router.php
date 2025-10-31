@@ -16,6 +16,7 @@ class Router {
     private function setupRoutes() {
         // User routes
         $this->routes['POST']['/api/user'] = ['UserController', 'createUser'];
+        $this->routes['POST']['/api/user/login'] = ['UserController', 'loginUser'];
         $this->routes['GET']['/api/user/{id}/profile'] = ['UserController', 'getUserProfile'];
         
         // Action routes

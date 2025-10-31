@@ -9,43 +9,70 @@
         .container { max-width: 900px; margin: auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
         h1 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
         h2, h3 { color: #555; }
-        #creation-form, #profile, #contract-board, #contract-create { padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; }
-        #message, #action-message, #contract-message { padding: 10px; margin-top: 10px; border-radius: 4px; }
+        #login-form, #creation-form, #profile, #contract-board, #contract-create { padding: 15px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 15px; }
+        #message, #action-message, #contract-message, #login-message { padding: 10px; margin-top: 10px; border-radius: 4px; }
         .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
         .skill-list div, .contract-item { margin-bottom: 10px; padding: 10px; border: 1px solid #eee; background-color: #fafafa; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
         .skill-info { flex-grow: 1; }
         .use-skill-btn, .accept-contract-btn, #create-contract-btn { background-color: #4CAF50; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
         .use-skill-btn:hover, .accept-contract-btn:hover, #create-contract-btn:hover { background-color: #45a049; }
         .contract-details { flex-grow: 1; }
+        .logout-btn { background-color: #dc3545; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-bottom: 15px; }
+        .logout-btn:hover { background-color: #c82333; }
+        .login-toggle { margin-top: 10px; text-align: center; }
+        .login-toggle a { color: #007bff; cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Echi di Aethel: Prototipo Tecnologico</h1>
 
-        <div id="creation-form">
+        <!-- Login Form -->
+        <div id="login-form">
+            <h2>Accedi con il tuo Personaggio</h2>
+            <input type="text" id="login-username" placeholder="Inserisci il nome del personaggio" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 60%; margin-right: 10px;">
+            <button id="login-btn" style="background-color: #007bff; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Accedi</button>
+            <p id="login-message"></p>
+            <div class="login-toggle">
+                <a id="show-create-link">Non hai un personaggio? Creane uno nuovo</a>
+            </div>
+        </div>
+
+        <!-- Creation Form -->
+        <div id="creation-form" style="display: none;">
             <h2>Crea il tuo Personaggio</h2>
             <input type="text" id="username" placeholder="Inserisci il nome del personaggio" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 60%; margin-right: 10px;">
             <button id="create-btn" style="background-color: #007bff; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Crea</button>
             <p id="message"></p>
+            <div class="login-toggle">
+                <a id="show-login-link">Hai già un personaggio? Accedi</a>
+            </div>
         </div>
 
         <hr>
 
+        <!-- Profile Section -->
         <div id="profile" style="display: none;">
-            <h2>Profilo di <span id="profile-name" style="color: #007bff;"></span></h2>
-            <div style="margin-bottom: 15px;">
-                <p><strong>Tratto Caratteriale:</strong> <span id="profile-trait" style="color: #e67e22; font-weight: bold;"></span></p>
-                <p id="trait-description" style="font-size: 0.9em; color: #777;"></p>
+            <button class="logout-btn" id="logout-btn">Logout</button>
+            <div id="profile-loading" style="padding: 20px; text-align: center; display: none;">
+                <p class="loading">Caricamento profilo...</p>
             </div>
-            
-            <button id="refresh-btn" style="background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-bottom: 15px;">Aggiorna Statistiche</button>
-            
-            <h3>Livelli di Mestiere e Azioni</h3>
-            <div id="action-message" style="display: none;"></div>
-            
-            <div id="skill-output" class="skill-list">
+            <div id="profile-content" style="display: none;">
+                <h2>Profilo di <span id="profile-name" style="color: #007bff;"></span></h2>
+                <div style="margin-bottom: 15px;">
+                    <p><strong>Tratto Caratteriale:</strong> <span id="profile-trait" style="color: #e67e22; font-weight: bold;"></span></p>
+                    <p id="trait-description" style="font-size: 0.9em; color: #777;"></p>
+                </div>
+                
+                <button id="refresh-btn" style="background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 4px; cursor: pointer; margin-bottom: 15px;">Aggiorna Statistiche</button>
+                
+                <h3>Livelli di Mestiere e Azioni</h3>
+                <div id="action-message" style="display: none;"></div>
+                
+                <div id="skill-output" class="skill-list">
+                </div>
             </div>
         </div>
 

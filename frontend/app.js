@@ -5,12 +5,25 @@ let availableSkills = []; // Per popolare il dropdown
 
 const set_message = (id, msg, type) => {
     const el = $(`#${id}`);
-    el.text(msg).removeClass('success error default').addClass(type).show();
+    el.text(msg).removeClass('success error default loading').addClass(type).show();
     if (type === 'default') el.css('background-color', '#eee').css('color', '#333');
+    if (type === 'loading') el.css('background-color', '#d1ecf1').css('color', '#0c5460');
     setTimeout(() => el.fadeOut(3000), 5000); // Nascondi dopo 5 secondi
 };
 
+const showProfileLoading = () => {
+    $('#profile-loading').show();
+    $('#profile-content').hide();
+};
+
+const hideProfileLoading = () => {
+    $('#profile-loading').hide();
+    $('#profile-content').show();
+};
+
 const loadProfile = (userId) => {
+    showProfileLoading();
+    
     $.ajax({
         url: API_BASE_URL + '/user/' + userId + '/profile',
         type: 'GET',
@@ -62,13 +75,51 @@ const loadProfile = (userId) => {
                 useSkill(skillName);
             });
             
+            hideProfileLoading();
             // Dopo aver caricato le skill, carichiamo la bacheca
             loadContracts(userId);
         },
         error: function() {
-            set_message('message', 'Errore nel caricamento del profilo.', 'error');
+            hideProfileLoading();
+            set_message('login-message', 'Errore nel caricamento del profilo.', 'error');
         }
     });
+};
+
+const login = (username) => {
+    set_message('login-message', 'Accesso in corso...', 'loading');
+
+    $.ajax({
+        url: API_BASE_URL + '/user/login',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ username: username }),
+        success: function(response) {
+            set_message('login-message', response.message, 'success');
+            currentUserId = response.user_id;
+            localStorage.setItem('echi_di_aethel_user_id', currentUserId);
+            $('#login-form').hide();
+            $('#creation-form').hide();
+            $('#profile').show();
+            loadProfile(currentUserId);
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            set_message('login-message', "Errore: " + (response ? response.error : "Errore sconosciuto"), 'error');
+        }
+    });
+};
+
+const logout = () => {
+    if (confirm('Sei sicuro di voler effettuare il logout?')) {
+        currentUserId = null;
+        localStorage.removeItem('echi_di_aethel_user_id');
+        $('#profile').hide();
+        $('#contract-board').hide();
+        $('#login-form').show();
+        $('#creation-form').hide();
+        $('#login-username').val('');
+    }
 };
 
 const useSkill = (skillName) => {
@@ -203,17 +254,43 @@ const createContract = () => {
 
 $(document).ready(function() {
     
+    // Check if user is already logged in
     currentUserId = localStorage.getItem('echi_di_aethel_user_id');
     if (currentUserId) {
+        $('#login-form').hide();
         $('#creation-form').hide();
         $('#profile').show();
         loadProfile(currentUserId);
+    } else {
+        $('#login-form').show();
+        $('#creation-form').hide();
+        $('#profile').hide();
     }
 
+    // Login button
+    $('#login-btn').on('click', function() {
+        const username = $('#login-username').val().trim();
+        if (username === "") { 
+            set_message('login-message', "Inserisci un nome utente valido.", 'error'); 
+            return; 
+        }
+        login(username);
+    });
 
+    // Login form Enter key
+    $('#login-username').on('keypress', function(e) {
+        if (e.which === 13) {
+            $('#login-btn').click();
+        }
+    });
+
+    // Create button
     $('#create-btn').on('click', function() {
         const username = $('#username').val().trim();
-        if (username === "") { set_message('message', "Inserisci un nome utente valido.", 'error'); return; }
+        if (username === "") { 
+            set_message('message', "Inserisci un nome utente valido.", 'error'); 
+            return; 
+        }
 
         set_message('message', "Creazione in corso...", 'default');
 
@@ -226,6 +303,7 @@ $(document).ready(function() {
                 set_message('message', response.message, 'success');
                 currentUserId = response.user_id;
                 localStorage.setItem('echi_di_aethel_user_id', currentUserId);
+                $('#login-form').hide();
                 $('#creation-form').hide();
                 $('#profile').show();
                 loadProfile(currentUserId);
@@ -238,14 +316,38 @@ $(document).ready(function() {
         });
     });
 
+    // Create form Enter key
+    $('#username').on('keypress', function(e) {
+        if (e.which === 13) {
+            $('#create-btn').click();
+        }
+    });
+
+    // Toggle between login and create forms
+    $('#show-create-link').on('click', function() {
+        $('#login-form').hide();
+        $('#creation-form').show();
+    });
+
+    $('#show-login-link').on('click', function() {
+        $('#creation-form').hide();
+        $('#login-form').show();
+    });
+
+    // Logout button
+    $('#logout-btn').on('click', logout);
+
+    // Refresh button
     $('#refresh-btn').on('click', function() {
         if (currentUserId) { loadProfile(currentUserId); }
     });
     
+    // Toggle create contract form
     $('#toggle-create-form-btn').on('click', function() {
         $('#contract-create').slideToggle();
     });
 
+    // Create contract button
     $('#create-contract-btn').on('click', createContract);
 
 });
