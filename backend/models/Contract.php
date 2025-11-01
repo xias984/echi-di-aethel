@@ -119,7 +119,7 @@ class Contract extends BaseModel {
     /**
      * Get skill ID by name
      */
-    private function getSkillIdByName($skill_name) {
+    public function getSkillIdByName($skill_name) {
         $stmt = $this->pdo->prepare("SELECT skill_id FROM skills WHERE name = ?");
         $stmt->execute([$skill_name]);
         return $stmt->fetchColumn();
@@ -163,6 +163,53 @@ class Contract extends BaseModel {
     public function deleteContract($contract_id) {
         $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE contract_id = ?");
         $stmt->execute([$contract_id]);
+    }
+    
+    /**
+     * Get all contracts with details (for admin)
+     */
+    public function getAllContractsWithDetails() {
+        $stmt = $this->pdo->query("
+            SELECT 
+                c.*,
+                s.name AS required_skill_name,
+                u_prop.username AS proposer_name,
+                u_accept.username AS acceptor_name
+            FROM contracts c
+            LEFT JOIN skills s ON c.required_skill_id = s.skill_id
+            LEFT JOIN users u_prop ON c.proposer_id = u_prop.user_id
+            LEFT JOIN users u_accept ON c.accepted_by_id = u_accept.user_id
+            ORDER BY c.created_at DESC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    /**
+     * Update a contract
+     */
+    public function updateContract($contract_id, $data) {
+        $allowed_fields = ['title', 'required_level', 'reward_amount', 'status'];
+        $update_data = [];
+        
+        foreach ($allowed_fields as $field) {
+            if (isset($data[$field])) {
+                $update_data[$field] = $data[$field];
+            }
+        }
+        
+        // If required_skill_name is provided, get the skill_id
+        if (isset($data['required_skill_name'])) {
+            $skill_id = $this->getSkillIdByName($data['required_skill_name']);
+            if ($skill_id) {
+                $update_data['required_skill_id'] = $skill_id;
+            }
+        }
+        
+        if (empty($update_data)) {
+            return false;
+        }
+        
+        return $this->update($contract_id, $update_data);
     }
 }
 ?>

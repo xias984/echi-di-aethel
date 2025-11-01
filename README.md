@@ -19,8 +19,20 @@
   ```powershell
   docker compose exec -T db pg_dump -U user_aethel -d db_aethel > "backup_aethel_$(Get-Date -Format 'yyyyMMdd_HHmmss').sql"
   ```
+  
+- **Esegui una migrazione SQL (aggiunge colonna admin)**  
+  **Per Linux/macOS:**  
+  ```sh
+  cat migration_add_admin_column.sql | docker compose exec -T db psql -U user_aethel -d db_aethel
+  ```  
+  **Per Windows (PowerShell):**  
+  ```powershell
+  Get-Content migration_add_admin_column.sql | docker compose exec -T db psql -U user_aethel -d db_aethel
+  ```
   Usa il comando appropriato a seconda del tuo sistema operativo per esportare il database in un file di backup sul tuo sistema locale. Il nome del file includerà data e ora.  
   _Nota: su Linux o macOS usa `date`, su Windows (PowerShell) usa `Get-Date`._
+  
+  Per eseguire una migrazione SQL (come aggiungere la colonna admin), usa i comandi sopra riportati nella sezione "Esegui una migrazione SQL".
 
 - **Carica un file di backup nel container**  
   ```sh

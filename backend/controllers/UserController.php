@@ -66,9 +66,14 @@ class UserController extends BaseController {
                 $this->errorResponse("Character not found. Please check the username.", 404);
             }
             
+            $is_admin = isset($user['admin']) ? (bool)$user['admin'] : false;
             $this->successResponse(
                 "Welcome back, {$user['username']}!",
-                ['user_id' => $user['user_id'], 'username' => $user['username']],
+                [
+                    'user_id' => $user['user_id'], 
+                    'username' => $user['username'],
+                    'admin' => $is_admin
+                ],
                 200
             );
         } catch (Exception $e) {

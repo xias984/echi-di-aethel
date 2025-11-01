@@ -30,6 +30,14 @@ class Router {
         $this->routes['POST']['/api/contracts/{id}/accept'] = ['ContractController', 'acceptContract'];
         $this->routes['GET']['/api/contracts'] = ['ContractController', 'getContracts'];
         $this->routes['DELETE']['/api/contracts/{id}'] = ['ContractController', 'deleteContract'];
+        
+        // Admin routes
+        $this->routes['POST']['/api/admin/users'] = ['AdminController', 'getAllUsers'];
+        $this->routes['POST']['/api/admin/contracts'] = ['AdminController', 'getAllContracts'];
+        $this->routes['PUT']['/api/admin/users/{id}'] = ['AdminController', 'updateUser'];
+        $this->routes['DELETE']['/api/admin/users/{id}'] = ['AdminController', 'deleteUser'];
+        $this->routes['PUT']['/api/admin/contracts/{id}'] = ['AdminController', 'updateContract'];
+        $this->routes['DELETE']['/api/admin/contracts/{id}'] = ['AdminController', 'deleteContract'];
     }
     
     /**

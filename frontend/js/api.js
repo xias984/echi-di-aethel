@@ -69,4 +69,31 @@ class ApiManager {
             reward_amount: rewardAmount
         });
     }
+
+    // Admin methods
+    getAdminUsers(adminId) {
+        return this.call('/admin/users', 'POST', { admin_id: adminId });
+    }
+
+    getAdminContracts(adminId) {
+        return this.call('/admin/contracts', 'POST', { admin_id: adminId });
+    }
+
+    updateUser(adminId, userId, data) {
+        const payload = { admin_id: adminId, ...data };
+        return this.call(`/admin/users/${userId}`, 'PUT', payload);
+    }
+
+    deleteUser(adminId, userId) {
+        return this.call(`/admin/users/${userId}`, 'DELETE', { admin_id: adminId });
+    }
+
+    updateContract(adminId, contractId, data) {
+        const payload = { admin_id: adminId, ...data };
+        return this.call(`/admin/contracts/${contractId}`, 'PUT', payload);
+    }
+
+    deleteContract(adminId, contractId) {
+        return this.call(`/admin/contracts/${contractId}`, 'DELETE', { admin_id: adminId });
+    }
 }

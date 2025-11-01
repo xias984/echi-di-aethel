@@ -6,6 +6,7 @@ class AppController {
         
         // Stato dell'applicazione
         this.currentUserId = null;
+        this.isAdmin = false;
         this.availableSkills = []; // Le skill dell'utente per il controllo in locale
 
         this.init();
@@ -17,9 +18,15 @@ class AppController {
     init() {
         // 1. Controlla l'accesso precedente
         this.currentUserId = localStorage.getItem('echi_di_aethel_user_id');
+        this.isAdmin = localStorage.getItem('echi_di_aethel_is_admin') === 'true';
+        
         if (this.currentUserId) {
             this.ui.showAppSections();
+            this.ui.showAdminSection(this.isAdmin);
             this.loadProfileAndContracts(this.currentUserId);
+            if (this.isAdmin) {
+                this.loadAdminData();
+            }
         } else {
             this.ui.toggleLoginForms(true); // Mostra il form di login
         }
@@ -66,9 +73,15 @@ class AppController {
             const response = await this.api.login(username);
             this.ui.setMessage('login-message', response.message, 'success');
             this.currentUserId = response.user_id;
+            this.isAdmin = response.admin || false;
             localStorage.setItem('echi_di_aethel_user_id', this.currentUserId);
+            localStorage.setItem('echi_di_aethel_is_admin', this.isAdmin ? 'true' : 'false');
             this.ui.showAppSections();
+            this.ui.showAdminSection(this.isAdmin);
             this.loadProfileAndContracts(this.currentUserId);
+            if (this.isAdmin) {
+                this.loadAdminData();
+            }
         } catch (error) {
             this.ui.setMessage('login-message', `Errore: ${error.message}`, 'error');
         }
@@ -98,8 +111,11 @@ class AppController {
     handleLogout() {
         if (confirm('Sei sicuro di voler effettuare il logout?')) {
             this.currentUserId = null;
+            this.isAdmin = false;
             localStorage.removeItem('echi_di_aethel_user_id');
+            localStorage.removeItem('echi_di_aethel_is_admin');
             this.ui.toggleLoginForms(true); // Torna al form di login
+            this.ui.showAdminSection(false);
             $('#login-username').val('');
         }
     }
@@ -187,6 +203,177 @@ class AppController {
         // Usa la delegazione su un genitore statico (es. document) per i bottoni "Usa Skill" e "Accetta Contratto"
         $(document).on('click', '.use-skill-btn', (e) => this.handleUseSkill(e));
         $(document).on('click', '.accept-contract-btn', (e) => this.handleAcceptContract(e));
+        
+        // Admin event listeners
+        $('#admin-refresh-btn').on('click', () => this.loadAdminData());
+        $('#admin-toggle-users-btn').on('click', () => $('#admin-users-section').slideToggle());
+        $('#admin-toggle-contracts-btn').on('click', () => $('#admin-contracts-section').slideToggle());
+        
+        // Admin user actions
+        $(document).on('click', '.edit-user-btn', (e) => {
+            const userId = $(e.currentTarget).data('user-id');
+            $(`.edit-user-row[data-user-id="${userId}"]`).slideToggle();
+        });
+        
+        $(document).on('click', '.cancel-edit-btn', (e) => {
+            const userId = $(e.currentTarget).data('user-id');
+            $(`.edit-user-row[data-user-id="${userId}"]`).slideUp();
+        });
+        
+        $(document).on('click', '.save-user-btn', (e) => {
+            const userId = $(e.currentTarget).data('user-id');
+            this.handleUpdateUser(userId);
+        });
+        
+        $(document).on('click', '.delete-user-btn', (e) => {
+            const userId = $(e.currentTarget).data('user-id');
+            this.handleDeleteUser(userId);
+        });
+        
+        // Admin contract actions
+        $(document).on('click', '.edit-contract-btn', (e) => {
+            const contractId = $(e.currentTarget).data('contract-id');
+            $(`.edit-contract-row[data-contract-id="${contractId}"]`).slideToggle();
+        });
+        
+        $(document).on('click', '.cancel-edit-contract-btn', (e) => {
+            const contractId = $(e.currentTarget).data('contract-id');
+            $(`.edit-contract-row[data-contract-id="${contractId}"]`).slideUp();
+        });
+        
+        $(document).on('click', '.save-contract-btn', (e) => {
+            const contractId = $(e.currentTarget).data('contract-id');
+            this.handleUpdateContract(contractId);
+        });
+        
+        $(document).on('click', '.delete-contract-btn', (e) => {
+            const contractId = $(e.currentTarget).data('contract-id');
+            this.handleDeleteContract(contractId);
+        });
+    }
+    
+    // Admin methods
+    async loadAdminData() {
+        if (!this.isAdmin || !this.currentUserId) return;
+        
+        try {
+            await Promise.all([
+                this.loadAdminUsers(),
+                this.loadAdminContracts()
+            ]);
+        } catch (error) {
+            this.ui.setMessage('admin-message', `Errore nel caricamento dati admin: ${error.message}`, 'error');
+        }
+    }
+    
+    async loadAdminUsers() {
+        this.ui.showAdminUsersLoading();
+        try {
+            const response = await this.api.getAdminUsers(this.currentUserId);
+            // Response can be {users: [...]} or just [...]
+            const users = response.users || (Array.isArray(response) ? response : []);
+            this.ui.renderAdminUsers(users);
+            this.ui.hideAdminUsersLoading();
+        } catch (error) {
+            this.ui.hideAdminUsersLoading();
+            this.ui.setMessage('admin-message', `Errore nel caricamento utenti: ${error.message}`, 'error');
+        }
+    }
+    
+    async loadAdminContracts() {
+        this.ui.showAdminContractsLoading();
+        try {
+            const response = await this.api.getAdminContracts(this.currentUserId);
+            // Response can be {contracts: [...]} or just [...]
+            const contracts = response.contracts || (Array.isArray(response) ? response : []);
+            this.ui.renderAdminContracts(contracts);
+            this.ui.hideAdminContractsLoading();
+        } catch (error) {
+            this.ui.hideAdminContractsLoading();
+            this.ui.setMessage('admin-message', `Errore nel caricamento contratti: ${error.message}`, 'error');
+        }
+    }
+    
+    async handleUpdateUser(userId) {
+        if (!this.isAdmin || !this.currentUserId) return;
+        
+        const row = $(`.edit-user-row[data-user-id="${userId}"]`);
+        const username = row.find('.edit-username').val().trim();
+        const isAdmin = row.find('.edit-admin').is(':checked');
+        
+        if (!username) {
+            this.ui.setMessage('admin-message', 'Il username è obbligatorio.', 'error');
+            return;
+        }
+        
+        try {
+            await this.api.updateUser(this.currentUserId, userId, {
+                username: username,
+                admin: isAdmin
+            });
+            this.ui.setMessage('admin-message', 'Utente aggiornato con successo.', 'success');
+            row.slideUp();
+            this.loadAdminUsers();
+        } catch (error) {
+            this.ui.setMessage('admin-message', `Errore nell'aggiornamento: ${error.message}`, 'error');
+        }
+    }
+    
+    async handleDeleteUser(userId) {
+        if (!this.isAdmin || !this.currentUserId) return;
+        
+        if (!confirm(`Sei sicuro di voler eliminare l'utente ${userId}?`)) return;
+        
+        try {
+            await this.api.deleteUser(this.currentUserId, userId);
+            this.ui.setMessage('admin-message', 'Utente eliminato con successo.', 'success');
+            this.loadAdminUsers();
+        } catch (error) {
+            this.ui.setMessage('admin-message', `Errore nell'eliminazione: ${error.message}`, 'error');
+        }
+    }
+    
+    async handleUpdateContract(contractId) {
+        if (!this.isAdmin || !this.currentUserId) return;
+        
+        const row = $(`.edit-contract-row[data-contract-id="${contractId}"]`);
+        const title = row.find('.edit-contract-title').val().trim();
+        const level = parseInt(row.find('.edit-contract-level').val());
+        const reward = parseInt(row.find('.edit-contract-reward').val());
+        const status = row.find('.edit-contract-status').val();
+        
+        if (!title || isNaN(level) || isNaN(reward)) {
+            this.ui.setMessage('admin-message', 'Compila tutti i campi correttamente.', 'error');
+            return;
+        }
+        
+        try {
+            await this.api.updateContract(this.currentUserId, contractId, {
+                title: title,
+                required_level: level,
+                reward_amount: reward,
+                status: status
+            });
+            this.ui.setMessage('admin-message', 'Contratto aggiornato con successo.', 'success');
+            row.slideUp();
+            this.loadAdminContracts();
+        } catch (error) {
+            this.ui.setMessage('admin-message', `Errore nell'aggiornamento: ${error.message}`, 'error');
+        }
+    }
+    
+    async handleDeleteContract(contractId) {
+        if (!this.isAdmin || !this.currentUserId) return;
+        
+        if (!confirm(`Sei sicuro di voler eliminare il contratto ${contractId}?`)) return;
+        
+        try {
+            await this.api.deleteContract(this.currentUserId, contractId);
+            this.ui.setMessage('admin-message', 'Contratto eliminato con successo.', 'success');
+            this.loadAdminContracts();
+        } catch (error) {
+            this.ui.setMessage('admin-message', `Errore nell'eliminazione: ${error.message}`, 'error');
+        }
     }
 }
 

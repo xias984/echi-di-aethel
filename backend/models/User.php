@@ -67,9 +67,17 @@ class User extends BaseModel {
      * Find user by username (for login)
      */
     public function findByUsername($username) {
-        $stmt = $this->pdo->prepare("SELECT user_id, username FROM {$this->table} WHERE username = ?");
+        $stmt = $this->pdo->prepare("SELECT user_id, username, admin FROM {$this->table} WHERE username = ?");
         $stmt->execute([$username]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin($user_id) {
+        $user = $this->findById($user_id);
+        return $user && isset($user['admin']) && (bool)$user['admin'];
     }
     
     /**
@@ -218,6 +226,50 @@ class User extends BaseModel {
     public function getAllUsers() {
         $stmt = $this->pdo->query("SELECT user_id, username FROM {$this->table}");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    /**
+     * Get all users with full profiles (for admin)
+     */
+    public function getAllUsersWithProfiles() {
+        $users = $this->getAllUsers();
+        $result = [];
+        
+        foreach ($users as $user) {
+            $profile = $this->getUserProfile($user['user_id']);
+            if ($profile) {
+                $userData = $this->findById($user['user_id']);
+                $result[] = [
+                    'user_id' => $user['user_id'],
+                    'username' => $user['username'],
+                    'admin' => isset($userData['admin']) ? (bool)$userData['admin'] : false,
+                    'skills' => $profile['skills'],
+                    'trait' => $profile['trait']
+                ];
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
+     * Update a user
+     */
+    public function updateUser($user_id, $data) {
+        $allowed_fields = ['username', 'admin'];
+        $update_data = [];
+        
+        foreach ($allowed_fields as $field) {
+            if (isset($data[$field])) {
+                $update_data[$field] = $data[$field];
+            }
+        }
+        
+        if (empty($update_data)) {
+            return false;
+        }
+        
+        return $this->update($user_id, $update_data);
     }
 
     /**

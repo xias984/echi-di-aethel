@@ -23,6 +23,19 @@
         .logout-btn:hover { background-color: #c82333; }
         .login-toggle { margin-top: 10px; text-align: center; }
         .login-toggle a { color: #007bff; cursor: pointer; text-decoration: underline; }
+        #admin-section { padding: 15px; border: 2px solid #dc3545; border-radius: 6px; margin-bottom: 15px; background-color: #fff5f5; }
+        .admin-header { color: #dc3545; font-weight: bold; }
+        .admin-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .admin-table th, .admin-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        .admin-table th { background-color: #f8f9fa; font-weight: bold; }
+        .admin-table tr:nth-child(even) { background-color: #f9f9f9; }
+        .admin-btn { background-color: #007bff; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+        .admin-btn:hover { background-color: #0056b3; }
+        .admin-btn-danger { background-color: #dc3545; }
+        .admin-btn-danger:hover { background-color: #c82333; }
+        .admin-edit-form { display: none; margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 4px; }
+        .admin-input { padding: 5px; border: 1px solid #ccc; border-radius: 4px; margin-right: 5px; margin-bottom: 5px; }
+        .skill-badge { display: inline-block; padding: 2px 6px; margin: 2px; background-color: #e9ecef; border-radius: 3px; font-size: 0.85em; }
     </style>
 </head>
 <body>
@@ -98,6 +111,38 @@
             <h3 style="margin-top: 20px;">Contratti Disponibili (Filtrati per il tuo Livello)</h3>
             <div id="contracts-list-output">
                 Caricamento contratti...
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Admin Section -->
+        <div id="admin-section" style="display: none;">
+            <h2 class="admin-header">⚙️ Modalità Admin</h2>
+            <p id="admin-message" style="display: none;"></p>
+            
+            <div style="margin-bottom: 20px;">
+                <button id="admin-refresh-btn" class="admin-btn">Aggiorna Dati</button>
+                <button id="admin-toggle-users-btn" class="admin-btn">Mostra/Nascondi Utenti</button>
+                <button id="admin-toggle-contracts-btn" class="admin-btn">Mostra/Nascondi Contratti</button>
+            </div>
+
+            <!-- Users Admin Section -->
+            <div id="admin-users-section" style="display: none;">
+                <h3>Gestione Utenti</h3>
+                <div id="admin-users-loading" style="padding: 20px; text-align: center; display: none;">
+                    <p class="loading">Caricamento utenti...</p>
+                </div>
+                <div id="admin-users-content"></div>
+            </div>
+
+            <!-- Contracts Admin Section -->
+            <div id="admin-contracts-section" style="display: none;">
+                <h3>Gestione Contratti</h3>
+                <div id="admin-contracts-loading" style="padding: 20px; text-align: center; display: none;">
+                    <p class="loading">Caricamento contratti...</p>
+                </div>
+                <div id="admin-contracts-content"></div>
             </div>
         </div>
     </div>
