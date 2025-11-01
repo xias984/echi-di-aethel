@@ -211,5 +211,21 @@ class User extends BaseModel {
             'xp_current_level' => $remaining_xp
         ];
     }
+
+    /**
+     * Get all users
+     */
+    public function getAllUsers() {
+        $stmt = $this->pdo->query("SELECT user_id, username FROM {$this->table}");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Delete a user
+     */
+    public function deleteUser($user_id) {
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+    }
 }
 ?>

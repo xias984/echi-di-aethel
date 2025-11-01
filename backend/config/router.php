@@ -18,6 +18,8 @@ class Router {
         $this->routes['POST']['/api/user'] = ['UserController', 'createUser'];
         $this->routes['POST']['/api/user/login'] = ['UserController', 'loginUser'];
         $this->routes['GET']['/api/user/{id}/profile'] = ['UserController', 'getUserProfile'];
+        $this->routes['GET']['/api/users'] = ['UserController', 'getUsers'];
+        $this->routes['DELETE']['/api/user/{id}'] = ['UserController', 'deleteUser'];
         
         // Action routes
         $this->routes['POST']['/api/action/use'] = ['ActionController', 'useSkill'];

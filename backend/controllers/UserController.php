@@ -76,5 +76,33 @@ class UserController extends BaseController {
             $this->errorResponse("Error during login: " . $e->getMessage(), 500);
         }
     }
+
+    /**
+     * List all users
+     */
+    public function getUsers() {
+        try {
+            $users = $this->userModel->getAllUsers();
+            $this->successResponse("Users retrieved successfully.", $users);
+        } catch (Exception $e) {
+            error_log("Users Error: " . $e->getMessage());
+            $this->errorResponse("Error retrieving users: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Delete a user
+     */
+    public function deleteUser($user_id) {
+        try {
+            $this->userModel->deleteUser((int)$user_id);
+            $this->successResponse("User deleted successfully.");
+        } catch (PDOException $e) {
+            $this->handleDbException($e);
+        } catch (Exception $e) {
+            error_log("Delete User Error: " . $e->getMessage());
+            $this->errorResponse("Error deleting user: " . $e->getMessage(), 500);
+        }
+    }
 }
 ?>
