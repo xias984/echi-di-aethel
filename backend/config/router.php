@@ -28,6 +28,8 @@ class Router {
         $this->routes['POST']['/api/contracts'] = ['ContractController', 'createContract'];
         $this->routes['GET']['/api/contracts/{id}'] = ['ContractController', 'getAvailableContracts'];
         $this->routes['POST']['/api/contracts/{id}/accept'] = ['ContractController', 'acceptContract'];
+        $this->routes['GET']['/api/contracts'] = ['ContractController', 'getContracts'];
+        $this->routes['DELETE']['/api/contracts/{id}'] = ['ContractController', 'deleteContract'];
     }
     
     /**

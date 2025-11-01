@@ -148,5 +148,21 @@ class Contract extends BaseModel {
         $stmt->execute([$user_id]);
         return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     }
+
+    /**
+     * Get all contracts
+     */
+    public function getContracts() {
+        $stmt = $this->pdo->query("SELECT * FROM {$this->table}");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Delete a contract
+     */
+    public function deleteContract($contract_id) {
+        $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE contract_id = ?");
+        $stmt->execute([$contract_id]);
+    }
 }
 ?>
