@@ -196,28 +196,42 @@ class AppController {
         $('#refresh-btn').on('click', () => this.loadProfileAndContracts(this.currentUserId));
         
         // Contratti
-        $('#toggle-create-form-btn').on('click', () => $('#contract-create').slideToggle());
+        $('#toggle-create-form-btn').on('click', () => $('#contract-create').toggleClass('hidden'));
         $('#create-contract-btn').on('click', () => this.handleCreateContract());
+        
+        // Admin Panel Modal
+        $('#admin-panel-btn').on('click', () => this.ui.toggleAdminModal());
+        $('#close-admin-btn').on('click', () => this.ui.closeAdminModal());
+        // Close modal when clicking outside
+        $('#admin-section').on('click', (e) => {
+            if (e.target.id === 'admin-section') {
+                this.ui.closeAdminModal();
+            }
+        });
         
         // Delegazione Eventi Dinamici (IMPORTANTE per elementi creati dinamicamente)
         // Usa la delegazione su un genitore statico (es. document) per i bottoni "Usa Skill" e "Accetta Contratto"
-        $(document).on('click', '.use-skill-btn', (e) => this.handleUseSkill(e));
+        $(document).on('click', '[data-skill-name]', (e) => {
+            if ($(e.currentTarget).data('skill-name')) {
+                this.handleUseSkill(e);
+            }
+        });
         $(document).on('click', '.accept-contract-btn', (e) => this.handleAcceptContract(e));
         
         // Admin event listeners
         $('#admin-refresh-btn').on('click', () => this.loadAdminData());
-        $('#admin-toggle-users-btn').on('click', () => $('#admin-users-section').slideToggle());
-        $('#admin-toggle-contracts-btn').on('click', () => $('#admin-contracts-section').slideToggle());
+        $('#admin-toggle-users-btn').on('click', () => $('#admin-users-section').toggleClass('hidden'));
+        $('#admin-toggle-contracts-btn').on('click', () => $('#admin-contracts-section').toggleClass('hidden'));
         
         // Admin user actions
         $(document).on('click', '.edit-user-btn', (e) => {
             const userId = $(e.currentTarget).data('user-id');
-            $(`.edit-user-row[data-user-id="${userId}"]`).slideToggle();
+            $(`.edit-user-row[data-user-id="${userId}"]`).toggleClass('hidden');
         });
         
         $(document).on('click', '.cancel-edit-btn', (e) => {
             const userId = $(e.currentTarget).data('user-id');
-            $(`.edit-user-row[data-user-id="${userId}"]`).slideUp();
+            $(`.edit-user-row[data-user-id="${userId}"]`).addClass('hidden');
         });
         
         $(document).on('click', '.save-user-btn', (e) => {
@@ -233,12 +247,12 @@ class AppController {
         // Admin contract actions
         $(document).on('click', '.edit-contract-btn', (e) => {
             const contractId = $(e.currentTarget).data('contract-id');
-            $(`.edit-contract-row[data-contract-id="${contractId}"]`).slideToggle();
+            $(`.edit-contract-row[data-contract-id="${contractId}"]`).toggleClass('hidden');
         });
         
         $(document).on('click', '.cancel-edit-contract-btn', (e) => {
             const contractId = $(e.currentTarget).data('contract-id');
-            $(`.edit-contract-row[data-contract-id="${contractId}"]`).slideUp();
+            $(`.edit-contract-row[data-contract-id="${contractId}"]`).addClass('hidden');
         });
         
         $(document).on('click', '.save-contract-btn', (e) => {
@@ -312,7 +326,7 @@ class AppController {
                 admin: isAdmin
             });
             this.ui.setMessage('admin-message', 'Utente aggiornato con successo.', 'success');
-            row.slideUp();
+            row.addClass('hidden');
             this.loadAdminUsers();
         } catch (error) {
             this.ui.setMessage('admin-message', `Errore nell'aggiornamento: ${error.message}`, 'error');
@@ -355,7 +369,7 @@ class AppController {
                 status: status
             });
             this.ui.setMessage('admin-message', 'Contratto aggiornato con successo.', 'success');
-            row.slideUp();
+            row.addClass('hidden');
             this.loadAdminContracts();
         } catch (error) {
             this.ui.setMessage('admin-message', `Errore nell'aggiornamento: ${error.message}`, 'error');
