@@ -88,25 +88,5 @@ class ContractController extends BaseController {
             }
         }
     }
-
-    public function getContracts() {
-        try {
-            $contracts = $this->contractModel->getContracts();
-            $this->successResponse("Contracts retrieved successfully.", $contracts);
-        } catch (Exception $e) {
-            error_log("Get Contracts Error: " . $e->getMessage());
-            $this->errorResponse("Error retrieving contracts: " . $e->getMessage(), 500);
-        }
-    }
-
-    public function deleteContract($contract_id) {
-        try {
-            $this->contractModel->deleteContract($contract_id);
-            $this->successResponse("Contract deleted successfully.");
-        } catch (Exception $e) {
-            error_log("Delete Contract Error: " . $e->getMessage());
-            $this->errorResponse("Error deleting contract: " . $e->getMessage(), 500);
-        }
-    }
 }
 ?>
