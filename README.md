@@ -41,7 +41,41 @@
   docker compose exec -T db pg_dump -U user_aethel -d db_aethel > "backup_aethel_$(Get-Date -Format 'yyyyMMdd_HHmmss').sql"
   ```
   
-- **Esegui una migrazione SQL (aggiunge colonna admin)**  
+### Sistema di Migrazione
+
+Il progetto include un sistema di migrazione automatico che semplifica la gestione delle modifiche al database.
+
+- **Esegui tutte le migrazioni pendenti**  
+  ```sh
+  docker compose exec -it php php backend/migrations/migrate.php migrate
+  ```
+  Esegue automaticamente tutte le migrazioni non ancora applicate al database.
+
+- **Verifica lo stato delle migrazioni**  
+  ```sh
+  docker compose exec -it php php backend/migrations/migrate.php status
+  ```
+  Mostra quali migrazioni sono state eseguite e quali sono pendenti.
+
+- **Crea una nuova migrazione**  
+  ```sh
+  docker compose exec -it php php backend/migrations/create_migration.php <descrizione>
+  ```
+  Esempi:
+  ```sh
+  docker compose exec -it php php backend/migrations/create_migration.php add_email_column
+  docker compose exec -it php php backend/migrations/create_migration.php create_products_table
+  docker compose exec -it php php backend/migrations/create_migration.php insert_initial_data
+  ```
+  Crea un nuovo file di migrazione nella cartella `backend/migrations/migrations/` con un template precompilato.
+
+- **Resetta il database (elimina tutto e ricrea)**  
+  ```sh
+  docker compose exec -it php php backend/migrations/migrate.php reset --confirm
+  ```
+  ⚠️ **ATTENZIONE**: Questo comando elimina tutte le tabelle e i dati, poi riesegue tutte le migrazioni per ricreare il database da zero. Usa con cautela!
+
+- **Esegui una migrazione SQL manuale (metodo legacy)**  
   **Per Linux/macOS:**  
   ```sh
   cat migration_add_admin_column.sql | docker compose exec -T db psql -U user_aethel -d db_aethel
@@ -50,10 +84,7 @@
   ```powershell
   Get-Content migration_add_admin_column.sql | docker compose exec -T db psql -U user_aethel -d db_aethel
   ```
-  Usa il comando appropriato a seconda del tuo sistema operativo per esportare il database in un file di backup sul tuo sistema locale. Il nome del file includerà data e ora.  
-  _Nota: su Linux o macOS usa `date`, su Windows (PowerShell) usa `Get-Date`._
-  
-  Per eseguire una migrazione SQL (come aggiungere la colonna admin), usa i comandi sopra riportati nella sezione "Esegui una migrazione SQL".
+  _Nota: Preferisci il sistema di migrazione automatico per nuove modifiche._
 
 - **Carica un file di backup nel container**  
   ```sh
