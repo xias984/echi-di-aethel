@@ -147,6 +147,28 @@ class User extends BaseModel {
     }
     
     /**
+     * Get user skills as a map (skill_id => level) for quick lookups
+     */
+    public function getUserSkillsMap($user_id) {
+        $stmt = $this->pdo->prepare("
+            SELECT us.skill_id, us.current_level, us.current_xp
+            FROM user_skills us
+            WHERE us.user_id = ?
+        ");
+        $stmt->execute([$user_id]);
+        $skills = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        $map = [];
+        foreach ($skills as $skill) {
+            // Calculate the actual level from XP
+            $xp_data = $this->calculateLevelAndXP($skill['current_xp']);
+            $map[$skill['skill_id']] = $xp_data['level'];
+        }
+        
+        return $map;
+    }
+
+    /**
      * Get user skills with calculated levels
      */
     private function getUserSkills($user_id) {

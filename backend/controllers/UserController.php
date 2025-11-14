@@ -3,6 +3,8 @@
 
 class UserController extends BaseController {
     private $userModel;
+    private $itemModel;
+    private $equipmentModel;
     
     public function __construct($pdo) {
         parent::__construct($pdo);
@@ -49,6 +51,61 @@ class UserController extends BaseController {
         } catch (Exception $e) {
             error_log("Profile Error: " . $e->getMessage());
             $this->errorResponse("Internal server error while retrieving profile.", 500);
+        }
+    }
+
+    /**
+     * Get user equipment
+     */
+    public function getUserEquipment($user_id) {
+        if (!$user_id || !is_numeric($user_id)) {
+            $this->errorResponse("Invalid user ID.");
+        }
+        try {
+            if (!$this->equipmentModel) $this->equipmentModel = new Equipment($this->pdo);
+
+            $equipment = $this->equipmentModel->getEquippedItems((int)$user_id);
+
+            $this->jsonResponse(['equipment' => $equipment]);  // Cambiato da 'equipmentModel' a 'equipment'
+        } catch (Exception $e) {
+            error_log("Equipment Error: " . $e->getMessage());
+            $this->errorResponse("Internal server error while retrieving equipment.", 500);
+        }
+    }
+
+    /**
+     * Get user inventory
+     */
+    public function getUserInventory($user_id) {
+        if (!$user_id || !is_numeric($user_id)) {
+            $this->errorResponse("Invalid user ID.");
+        }
+        try {
+            if (!$this->itemModel) $this->itemModel = new Item($this->pdo);
+
+            $inventory = $this->itemModel->getUserInventory((int)$user_id);
+
+            $this->jsonResponse(['inventory' => $inventory]);
+        } catch (Exception $e) {
+            error_log("Inventory Error: " . $e->getMessage());
+            $this->errorResponse("Internal server error while retrieving inventory.", 500);
+        }
+    }
+
+    /**
+     * Equip an item
+     */
+    public function equipItem() {
+        $data = $this->getJsonInput();
+        $this->validateRequired($data, ['user_id', 'item_id']);
+
+        try {
+            if (!$this->equipmentModel) $this->equipmentModel = new Equipment($this->pdo);
+            $item = $this->equipmentModel->equipItem((int)$data['user_id'], (int)$data['item_id']);
+            $this->successResponse("Oggetto '{$item['name']}' equipaggiato con successo.");
+        } catch (Exception $e) {
+            error_log("Equipment Error: " . $e->getMessage());
+            $this->errorResponse("Errore nell'equipaggiamento: " . $e->getMessage(), 500);
         }
     }
 

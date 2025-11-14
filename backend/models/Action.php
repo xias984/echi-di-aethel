@@ -7,6 +7,7 @@ class Action extends BaseModel {
     protected function getPrimaryKey() {
         return 'user_skill_id';
     }
+    private $equipmentModel;
     
     /**
      * Use a skill and gain XP
@@ -14,6 +15,7 @@ class Action extends BaseModel {
     public function useSkill($user_id, $skill_name, $action_time = 5) {
         try {
             $this->beginTransaction();
+            if (!$this->equipmentModel) $this->equipmentModel = new Equipment($this->pdo);
             
             // Get current skill data
             $skill_data = $this->getUserSkillData($user_id, $skill_name);
@@ -23,9 +25,12 @@ class Action extends BaseModel {
             
             // Get user trait modifier
             $trait_modifier = $this->getUserTraitModifier($user_id);
+
+            // Get equipped tool for bonus
+            $tool_bonus = $this->getEquippedToolBonus($user_id, $skill_data['skill_id']);
             
             // Calculate XP gain
-            $xp_result = $this->calculateXPGain($trait_modifier);
+            $xp_result = $this->calculateXPGain($trait_modifier, $tool_bonus);
             
             // Update skill XP
             $new_total_xp = $skill_data['current_xp'] + $xp_result['xp_gain'];
@@ -43,7 +48,7 @@ class Action extends BaseModel {
             $this->commit();
             
             return [
-                'message' => $xp_result['message'] . " Hai guadagnato " . $xp_result['xp_gain'] . " XP in " . $skill_name . ".",
+                'message' => $xp_result['message'] . " Hai guadagnato " . $xp_result['xp_gain'] . " XP in " . $skill_name . "." . $xp_result['tool_message'],
                 'xp_gain' => $xp_result['xp_gain'],
                 'new_level' => $new_level_data['level'],
                 'level_up' => $level_up,
@@ -54,6 +59,11 @@ class Action extends BaseModel {
             $this->rollback();
             throw $e;
         }
+    }
+
+    private function getEquippedToolBonus($user_id, $skill_id) {
+        $tool = $this->equipmentModel->getEquippedToolForSkill($user_id, $skill_id);
+        return $tool['bonus_crit_chance'] ?? 0.00;
     }
     
     /**
@@ -87,19 +97,31 @@ class Action extends BaseModel {
     /**
      * Calculate XP gain based on dice roll and traits
      */
-    private function calculateXPGain($trait_modifier) {
+    private function calculateXPGain($trait_modifier, $tool_crit_bonus = 0.00) {
         $base_xp = BASE_XP_GAIN;
         $roll = rand(1, 100);
         
         $result_message = "Successo Base. ";
+        $tool_message = "";
         $xp_multiplier = 1.0;
         
-        if ($roll > 90) {
+        $crit_threshold = 90.0 - ($tool_crit_bonus * 100);
+
+        if ($roll > $crit_threshold) {
+            // Caso 1: Successo Critico (con o senza bonus strumento)
             $result_message = "Successo Critico! Ottieni un bonus per la qualità.";
             $xp_multiplier = 2.5;
+            if ($tool_crit_bonus > 0) {
+                $tool_message = " (Aumento critico grazie allo strumento equipaggiato)";
+            }
         } elseif ($roll < 5) {
+            // Caso 2: Fallimento Critico (roll bassissimo)
             $result_message = "Fallimento Critico! Tempo sprecato, guadagno XP minimo.";
             $xp_multiplier = 0.1;
+        } else {
+            // Caso 3: Successo Base (tutto il resto)
+            $result_message = "Successo Base. ";
+            $xp_multiplier = 1.0;
         }
         
         // Apply trait bonus
@@ -112,6 +134,7 @@ class Action extends BaseModel {
         
         return [
             'message' => $result_message,
+            'tool_message' => $tool_message,
             'xp_gain' => $xp_gain
         ];
     }

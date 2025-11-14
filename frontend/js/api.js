@@ -36,6 +36,18 @@ class ApiManager {
         return this.call('/user/login', 'POST', { username });
     }
 
+    getUserEquipment(userId) {
+        return this.call(`/user/${userId}/equipment`, 'GET');
+    }
+
+    getUserInventory(userId) {
+        return this.call(`/user/${userId}/inventory`, 'GET');
+    }
+
+    equipItem(userId, itemId) {
+        return this.call('/user/equip', 'POST', { user_id: userId, item_id: itemId });
+    }
+
     createUser(username) {
         return this.call('/user', 'POST', { username });
     }

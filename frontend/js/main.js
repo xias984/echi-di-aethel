@@ -50,6 +50,15 @@ class AppController {
             const contracts = await this.api.getContracts(userId);
             this.ui.renderContracts(contracts, userId);
 
+            // Carica Equipaggiamento
+            const equipmentResponse = await this.api.getUserEquipment(userId);
+            this.ui.renderEquipment(equipmentResponse.equipment);
+
+            // Carica Inventario
+            const inventoryResponse = await this.api.getUserInventory(userId);
+            console.log(inventoryResponse);
+            this.ui.renderInventory(inventoryResponse.inventory);
+
             this.ui.hideProfileLoading();
         } catch (error) {
             this.ui.hideProfileLoading();
@@ -163,6 +172,22 @@ class AppController {
         }
     }
 
+    async handleEquipItem(event) {
+        if (!this.currentUserId) return;
+        const itemId = $(event.currentTarget).data('item-id');
+
+        this.ui.setMessage('action-message', 'Equipaggiamento in corso...', 'loading');
+
+        try {
+            const response = await this.api.equipItem(this.currentUserId, itemId);
+            this.ui.setMessage('action-message', response.message, 'success');
+            // Ricarica per vedere l'equipaggiamento aggiornato e l'inventario
+            this.loadProfileAndContracts(this.currentUserId);
+        } catch (error) {
+            this.ui.setMessage('action-message', `Errore nell'equipaggiamento: ${error.message}`, 'error');
+        }
+    }
+
     async handleAcceptContract(event) {
         if (!this.currentUserId) return;
         const contractId = $(event.currentTarget).data('contract-id');
@@ -211,6 +236,9 @@ class AppController {
         
         // Delegazione Eventi Dinamici (IMPORTANTE per elementi creati dinamicamente)
         // Usa la delegazione su un genitore statico (es. document) per i bottoni "Usa Skill" e "Accetta Contratto"
+        $(document).on('click', '.inventory-item', (e) => {
+            this.handleEquipItem(e);
+        })
         $(document).on('click', '[data-skill-name]', (e) => {
             if ($(e.currentTarget).data('skill-name')) {
                 this.handleUseSkill(e);
