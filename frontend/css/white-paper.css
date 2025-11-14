@@ -1,0 +1,44 @@
+/* ============================================
+   White Paper - Stili Personalizzati
+   ============================================ */
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #FDFBF8;
+    color: #402E32;
+}
+
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    height: 350px;
+    max-height: 400px;
+}
+
+.nav-link {
+    transition: color 0.3s, border-bottom-color 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover, 
+.nav-link.active {
+    color: #A67B5B;
+    border-bottom-color: #A67B5B;
+}
+
+.tab-button {
+    transition: all 0.3s;
+}
+
+.tab-button.active {
+    background-color: #A67B5B;
+    color: #FDFBF8;
+}
+

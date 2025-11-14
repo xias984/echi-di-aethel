@@ -52,6 +52,18 @@ class App {
 
 // Avvia l'applicazione all'avvio del documento
 $(document).ready(() => {
+    // Filtra gli errori delle estensioni del browser (innocui)
+    window.addEventListener('error', (event) => {
+        if (event.filename && (
+            event.filename.includes('chrome-extension://') ||
+            event.filename.includes('content_script.js') ||
+            event.filename.includes('moz-extension://')
+        )) {
+            event.preventDefault();
+            return false;
+        }
+    }, true);
+
     try {
         // Verifica che tutte le dipendenze siano caricate
         if (typeof StateManager === 'undefined' || typeof Router === 'undefined' || 

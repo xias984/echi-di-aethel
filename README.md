@@ -4,6 +4,27 @@
 
 ### Database
 
+- **Accedi a pgAdmin (Interfaccia Web per PostgreSQL)**  
+  Dopo aver avviato i container con `docker compose up`, apri il browser e vai a:
+  ```
+  http://localhost:5050
+  ```
+  **Credenziali di default:**
+  - Email: `admin@admin.com`
+  - Password: `admin`
+  
+  **Per connetterti al database:**
+  1. Clicca destro su "Servers" → "Register" → "Server"
+  2. Nella tab "General":
+     - Name: `Aethel Database` (o qualsiasi nome)
+  3. Nella tab "Connection":
+     - Host name/address: `db` (nome del servizio Docker)
+     - Port: `5432`
+     - Maintenance database: `db_aethel` (o il nome del tuo database)
+     - Username: `user_aethel` (o il tuo DB_USER)
+     - Password: `password_aethel` (o il tuo DB_PASS)
+  4. Clicca "Save"
+
 - **Accedi al database PostgreSQL nel container**  
   ```sh
   docker compose exec -it db psql -U user_aethel -d db_aethel

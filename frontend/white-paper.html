@@ -3,67 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Echi di Aethel - White Paper Interattivo</title>
+    <title data-i18n="title"></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Aethel Rebirth -->
-    <!-- Application Structure Plan: Ho progettato una SPA tematica con una navigazione sticky per consentire un'esplorazione non lineare dei concetti chiave del gioco. La struttura è suddivisa in sezioni logiche: Visione e Mondo, Meccaniche di Gioco (con tab interattivi per personaggio, progressione e mestieri), Economia (con una simulazione della Bacheca) e Roadmap. Questa architettura trasforma un documento testuale in un'esperienza interattiva, permettendo all'utente di concentrarsi sulle caratteristiche più innovative del gioco in modo intuitivo e coinvolgente. -->
-    <!-- Visualization & Content Choices: Ho scelto di visualizzare i dati concettuali del report per massimizzare la comprensione. La curva di progressione XP è rappresentata con un grafico a linee di Chart.js per mostrare il cambiamento nel tempo. L'albero dei mestieri è un diagramma HTML/CSS interattivo per organizzare le informazioni gerarchiche. La creazione del personaggio e la bacheca dei contratti sono simulate con elementi HTML interattivi per dimostrare le meccaniche di gioco. Questa scelta mira a informare e coinvolgere l'utente in modo più efficace rispetto al solo testo. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDFBF8;
-            color: #402E32;
-        }
-        h1, h2, h3 {
-            font-family: 'Cinzel', serif;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
-        }
-        .nav-link {
-            transition: color 0.3s, border-bottom-color 0.3s;
-            border-bottom: 2px solid transparent;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: #A67B5B;
-            border-bottom-color: #A67B5B;
-        }
-        .tab-button {
-            transition: all 0.3s;
-        }
-        .tab-button.active {
-            background-color: #A67B5B;
-            color: #FDFBF8;
-        }
-    </style>
+    <link rel="stylesheet" href="css/white-paper.css">
 </head>
 <body class="antialiased">
 
     <header id="header" class="bg-[#FDFBF8] sticky top-0 z-50 shadow-md">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-[#6F4E37]">Echi di Aethel</h1>
-            <div class="hidden md:flex space-x-8">
-                <a href="#visione" class="nav-link pb-1">Visione</a>
-                <a href="#meccaniche" class="nav-link pb-1">Meccaniche</a>
-                <a href="#economia" class="nav-link pb-1">Economia</a>
-                <a href="#roadmap" class="nav-link pb-1">Roadmap</a>
+            <h1 class="text-2xl font-bold text-[#6F4E37]" data-i18n="title"></h1>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#visione" class="nav-link pb-1" data-i18n="nav.vision"></a>
+                <a href="#meccaniche" class="nav-link pb-1" data-i18n="nav.mechanics"></a>
+                <a href="#economia" class="nav-link pb-1" data-i18n="nav.economy"></a>
+                <a href="#roadmap" class="nav-link pb-1" data-i18n="nav.roadmap"></a>
+                
+                <select id="language-selector" class="bg-white text-[#6F4E37] rounded-md p-1 border border-[#A67B5B] focus:ring-2 focus:ring-[#A67B5B] focus:border-[#A67B5B] ml-4">
+                    <option value="it">Italiano</option>
+                    <option value="en">English</option>
+                </select>
+                
                 <a 
-                    href="assets/white-paper.pdf" 
+                    id="header-pdf-link"
+                    href="#" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     class="flex items-center justify-center px-3 py-2 rounded-lg font-bold border-2 border-[#A67B5B] bg-[#6F4E37] text-[#FDFBF8] hover:bg-[#FDFBF8] hover:text-[#6F4E37] hover:border-[#6F4E37] transition-colors"
-                    aria-label="Scarica il white paper in PDF"
+                    data-i18n-aria="aria.download_pdf"
                     style="margin-left: 1rem; height: 30px;"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,35 +52,35 @@
     <main>
         <section id="hero" class="relative text-center py-24 md:py-32 bg-cover bg-center" style="background-image: linear-gradient(rgba(253, 251, 248, 0.8), rgba(253, 251, 248, 1)), url('https://placehold.co/1920x1080/D3C5B6/402E32?text=Aethel+Ruins');">
             <div class="container mx-auto px-6">
-                <h1 class="text-5xl md:text-7xl font-bold text-[#402E32] mb-4">Un Mondo Plasmato dai Giocatori</h1>
-                <p class="text-lg md:text-xl max-w-3xl mx-auto text-[#6F4E37] mb-8">Un MMORPG Sandbox dove la specializzazione, la collaborazione e un'economia guidata dai giocatori non sono un'opzione, ma il cuore dell'esperienza.</p>
-				<div class="flex flex-col sm:flex-row gap-4 justify-center">
-					<a href="#visione" class="bg-[#A67B5B] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#8C6239] transition-colors">Esplora il Concetto</a>
-					<a href="assets/white-paper.pdf" download class="bg-white text-[#6F4E37] font-bold py-3 px-8 rounded-lg border border-[#A67B5B] hover:bg-[#F5ECE2] transition-colors" aria-label="Scarica il white paper in PDF">Scarica PDF</a>
-				</div>
+                <h1 class="text-5xl md:text-7xl font-bold text-[#402E32] mb-4" data-i18n="hero.title"></h1>
+                <p class="text-lg md:text-xl max-w-3xl mx-auto text-[#6F4E37] mb-8" data-i18n="hero.subtitle"></p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#visione" class="bg-[#A67B5B] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#8C6239] transition-colors" data-i18n="hero.explore_concept"></a>
+                    <a id="hero-pdf-link" href="#" download class="bg-white text-[#6F4E37] font-bold py-3 px-8 rounded-lg border border-[#A67B5B] hover:bg-[#F5ECE2] transition-colors" data-i18n="hero.download_pdf" data-i18n-aria="aria.download_pdf"></a>
+                </div>
             </div>
         </section>
 
         <section id="visione" class="py-20 md:py-28">
             <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center mb-4">La Visione e il Mondo</h2>
-                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">Il nostro obiettivo è creare un ecosistema vivo, dove i giocatori non sono semplici visitatori, ma gli architetti di una civiltà rinata dalle ceneri di una catastrofe dimenticata.</p>
+                <h2 class="text-4xl font-bold text-center mb-4" data-i18n="vision.title"></h2>
+                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12" data-i18n="vision.subtitle"></p>
                 <div class="grid md:grid-cols-2 gap-12 items-center">
                     <div class="space-y-6">
-                        <h3 class="text-2xl font-bold text-[#6F4E37]">Il Grande Squarcio</h3>
-                        <p class="text-gray-700">Secoli fa, la civiltà di Aethel raggiunse l'apice del potere attraverso l'Aetherurgia, una fusione di magia e tecnologia. Nel tentativo di imporre un ordine perfetto sulla realtà, provocarono "Il Grande Squarcio", un cataclisma che frantumò non solo le loro città, ma la conoscenza e il destino stesso del mondo.</p>
-                        <h3 class="text-2xl font-bold text-[#6F4E37]">L'Eredità degli Echi</h3>
-                        <p class="text-gray-700">I giocatori sono i discendenti dei sopravvissuti, risvegliati in un mondo selvaggio senza memoria. La trama è la scoperta collettiva degli "Echi di Aethel": frammenti di schemi e storie che, una volta riuniti, permetteranno di svelare i segreti del passato e ricostruire il futuro. Ogni azione, ogni oggetto creato, è un passo verso la riconquista della conoscenza perduta.</p>
+                        <h3 class="text-2xl font-bold text-[#6F4E37]" data-i18n="vision.schism_title"></h3>
+                        <p class="text-gray-700" data-i18n="vision.schism_body"></p>
+                        <h3 class="text-2xl font-bold text-[#6F4E37]" data-i18n="vision.echoes_title"></h3>
+                        <p class="text-gray-700" data-i18n="vision.echoes_body"></p>
                     </div>
                     <div class="p-8 bg-[#EAE0D5] rounded-xl shadow-lg">
                         <div class="flex items-center mb-4">
                             <span class="text-3xl mr-4">📜</span>
-                            <h3 class="text-2xl font-bold text-[#6F4E37]">Principi Chiave</h3>
+                            <h3 class="text-2xl font-bold text-[#6F4E37]" data-i18n="vision.principles_title"></h3>
                         </div>
                         <ul class="space-y-3 list-inside list-disc text-gray-800">
-                            <li><strong class="font-semibold">Progressione Significativa:</strong> Il livello è il risultato di scoperte e qualità, non di grinding.</li>
-                            <li><strong class="font-semibold">Impatto sul Mondo:</strong> I giocatori sono gli artefici della rinascita della civiltà.</li>
-                            <li><strong class="font-semibold">Interdipendenza Sociale:</strong> La collaborazione non è un'opzione, è una necessità. Nessuno può fare tutto da solo.</li>
+                            <li><strong class="font-semibold" data-i18n="vision.principle1_key"></strong> <span data-i18n="vision.principle1_value"></span></li>
+                            <li><strong class="font-semibold" data-i18n="vision.principle2_key"></strong> <span data-i18n="vision.principle2_value"></span></li>
+                            <li><strong class="font-semibold" data-i18n="vision.principle3_key"></strong> <span data-i18n="vision.principle3_value"></span></li>
                         </ul>
                     </div>
                 </div>
@@ -119,50 +89,50 @@
 
         <section id="meccaniche" class="py-20 md:py-28 bg-[#EAE0D5]/50">
             <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center mb-12">Meccaniche di Gioco Fondamentali</h2>
+                <h2 class="text-4xl font-bold text-center mb-12" data-i18n="mechanics.title"></h2>
                 
                 <div class="w-full max-w-4xl mx-auto">
                     <div class="mb-8 flex justify-center border-b border-gray-300">
-                        <button class="tab-button text-lg font-semibold py-3 px-6 active" data-tab="personaggio">Creazione</button>
-                        <button class="tab-button text-lg font-semibold py-3 px-6" data-tab="progressione">Progressione</button>
-                        <button class="tab-button text-lg font-semibold py-3 px-6" data-tab="mestieri">Mestieri</button>
+                        <button class="tab-button text-lg font-semibold py-3 px-6 active" data-tab="personaggio" data-i18n="mechanics.tab1"></button>
+                        <button class="tab-button text-lg font-semibold py-3 px-6" data-tab="progressione" data-i18n="mechanics.tab2"></button>
+                        <button class="tab-button text-lg font-semibold py-3 px-6" data-tab="mestieri" data-i18n="mechanics.tab3"></button>
                     </div>
 
                     <div id="tab-content">
                         <div class="tab-pane active" id="personaggio">
-                            <h3 class="text-3xl font-bold text-center mb-4 text-[#6F4E37]">Il Destino Casuale</h3>
-                            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-10">La creazione del personaggio è minimalista per massimizzare l'interpretazione. Scegli il genere; il resto è determinato da "Tiri di Destino" nascosti che renderanno ogni personaggio unico.</p>
+                            <h3 class="text-3xl font-bold text-center mb-4 text-[#6F4E37]" data-i18n="creation.title"></h3>
+                            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-10" data-i18n="creation.subtitle"></p>
                             <div class="bg-white p-8 rounded-xl shadow-lg max-w-md mx-auto">
-                                <h4 class="text-xl font-bold text-center mb-6">Genera il Tuo Destino</h4>
+                                <h4 class="text-xl font-bold text-center mb-6" data-i18n="creation.generator_title"></h4>
                                 <div class="space-y-4 mb-6">
                                     <div>
-                                        <label class="font-semibold text-gray-700">Talento Nascosto</label>
+                                        <label class="font-semibold text-gray-700" data-i18n="creation.talent_label"></label>
                                         <div id="talento-output" class="mt-1 p-3 bg-gray-100 rounded-md text-gray-800 h-10"></div>
                                     </div>
                                     <div>
-                                        <label class="font-semibold text-gray-700">Tratto Caratteriale</label>
+                                        <label class="font-semibold text-gray-700" data-i18n="creation.trait_label"></label>
                                         <div id="tratto-output" class="mt-1 p-3 bg-gray-100 rounded-md text-gray-800 h-10"></div>
                                     </div>
                                     <div>
-                                        <label class="font-semibold text-gray-700">Gancio Narrativo</label>
+                                        <label class="font-semibold text-gray-700" data-i18n="creation.hook_label"></label>
                                         <div id="gancio-output" class="mt-1 p-3 bg-gray-100 rounded-md text-gray-800 h-10"></div>
                                     </div>
                                 </div>
-                                <button id="genera-destino-btn" class="w-full bg-[#A67B5B] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#8C6239] transition-colors">Lancia i Dadi del Destino</button>
+                                <button id="genera-destino-btn" class="w-full bg-[#A67B5B] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#8C6239] transition-colors" data-i18n="creation.button"></button>
                             </div>
                         </div>
 
                         <div class="tab-pane hidden" id="progressione">
-                            <h3 class="text-3xl font-bold text-center mb-4 text-[#6F4E37]">Progressione Non Lineare</h3>
-                            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-10">L'esperienza non deriva dalla ripetizione, ma dalla qualità e dalla scoperta. La curva di progressione premia l'apprendimento iniziale e richiede maestria e dedizione per raggiungere i livelli più alti.</p>
+                            <h3 class="text-3xl font-bold text-center mb-4 text-[#6F4E37]" data-i18n="progression.title"></h3>
+                            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-10" data-i18n="progression.subtitle"></p>
                             <div class="chart-container bg-white p-4 rounded-xl shadow-lg">
                                 <canvas id="xpCurveChart"></canvas>
                             </div>
                         </div>
 
                         <div class="tab-pane hidden" id="mestieri">
-                            <h3 class="text-3xl font-bold text-center mb-4 text-[#6F4E37]">L'Albero delle Maestrie</h3>
-                            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-10">Inizia con uno dei cinque mestieri base e specializzati in rami avanzati. Ogni mestiere è vitale per l'ecosistema del gioco. Passa il mouse su una carta per scoprire di più.</p>
+                            <h3 class="text-3xl font-bold text-center mb-4 text-[#6F4E37]" data-i18n="trades.title"></h3>
+                            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-10" data-i18n="trades.subtitle"></p>
                             <div id="mestieri-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                             </div>
                         </div>
@@ -173,18 +143,18 @@
 
         <section id="economia" class="py-20 md:py-28">
             <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center mb-12">L'Economia: La Bacheca degli Echi</h2>
-                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">Il cuore sociale del gioco. Un marketplace di servizi dove i giocatori pubblicano contratti, assumono professionisti e costruiscono la propria reputazione. L'interdipendenza è il motore di ogni transazione.</p>
+                <h2 class="text-4xl font-bold text-center mb-12" data-i18n="economy.title"></h2>
+                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12" data-i18n="economy.subtitle"></p>
                 <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
                     <div class="bg-[#6F4E37] text-white p-4 flex justify-between items-center">
-                        <h3 class="text-2xl font-bold">Bacheca dei Contratti</h3>
+                        <h3 class="text-2xl font-bold" data-i18n="economy.board_title"></h3>
                         <div class="flex space-x-2">
-                            <label for="contract-filter" class="sr-only">Filtra per mestiere</label>
+                            <label for="contract-filter" class="sr-only" data-i18n="economy.filter_label"></label>
                             <select id="contract-filter" class="bg-white text-[#6F4E37] rounded-md p-2 border border-gray-300 focus:ring-2 focus:ring-[#A67B5B] focus:border-[#A67B5B]">
-                                <option value="all">Tutti i Mestieri</option>
-                                <option value="Lottatore">Lottatore</option>
-                                <option value="Fabbricatore">Fabbricatore</option>
-                                <option value="Raccoglitore">Raccoglitore</option>
+                                <option value="all" data-i18n="economy.filter_all"></option>
+                                <option value="Lottatore" data-i18n="economy.filter_fighter"></option>
+                                <option value="Fabbricatore" data-i18n="economy.filter_crafter"></option>
+                                <option value="Raccoglitore" data-i18n="economy.filter_gatherer"></option>
                             </select>
                         </div>
                     </div>
@@ -196,30 +166,30 @@
 
         <section id="roadmap" class="py-20 md:py-28 bg-[#EAE0D5]/50">
             <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center mb-12">Roadmap e Futuro</h2>
+                <h2 class="text-4xl font-bold text-center mb-12" data-i18n="roadmap.title"></h2>
                 <div class="grid md:grid-cols-2 gap-12">
                     <div class="bg-white p-8 rounded-xl shadow-lg">
                         <div class="flex items-center mb-4">
                             <span class="text-3xl mr-4">🛠️</span>
-                            <h3 class="text-2xl font-bold text-[#6F4E37]">Architettura Tecnica</h3>
+                            <h3 class="text-2xl font-bold text-[#6F4E37]" data-i18n="roadmap.tech_title"></h3>
                         </div>
-                        <p class="text-gray-700 mb-4">Sviluppato con un'architettura moderna e scalabile per garantire stabilità e future espansioni.</p>
+                        <p class="text-gray-700 mb-4" data-i18n="roadmap.tech_body"></p>
                         <ul class="space-y-2">
-                            <li class="flex items-center"><span class="bg-[#A67B5B] text-white rounded-full w-6 h-6 text-center mr-3 font-mono">B</span> <strong>Backend:</strong> API RESTful in PHP per tutta la logica di gioco.</li>
-                            <li class="flex items-center"><span class="bg-[#A67B5B] text-white rounded-full w-6 h-6 text-center mr-3 font-mono">D</span> <strong>Database:</strong> PostgreSQL per la gestione robusta dei dati.</li>
-                            <li class="flex items-center"><span class="bg-[#A67B5B] text-white rounded-full w-6 h-6 text-center mr-3 font-mono">F</span> <strong>Frontend:</strong> Applicazione web leggera (HTML/JS) per la massima accessibilità.</li>
+                            <li class="flex items-center"><span class="bg-[#A67B5B] text-white rounded-full w-6 h-6 text-center mr-3 font-mono">B</span> <strong data-i18n="roadmap.tech_be"></strong> <span data-i18n="roadmap.tech_be_desc"></span></li>
+                            <li class="flex items-center"><span class="bg-[#A67B5B] text-white rounded-full w-6 h-6 text-center mr-3 font-mono">D</span> <strong data-i18n="roadmap.tech_db"></strong> <span data-i18n="roadmap.tech_db_desc"></span></li>
+                            <li class="flex items-center"><span class="bg-[#A67B5B] text-white rounded-full w-6 h-6 text-center mr-3 font-mono">F</span> <strong data-i18n="roadmap.tech_fe"></strong> <span data-i18n="roadmap.tech_fe_desc"></span></li>
                         </ul>
                     </div>
                      <div class="bg-white p-8 rounded-xl shadow-lg">
                         <div class="flex items-center mb-4">
                             <span class="text-3xl mr-4">💰</span>
-                            <h3 class="text-2xl font-bold text-[#6F4E37]">Monetizzazione</h3>
+                            <h3 class="text-2xl font-bold text-[#6F4E37]" data-i18n="roadmap.monet_title"></h3>
                         </div>
-                        <p class="text-gray-700 mb-4">Un approccio etico e graduale che evita il "pay-to-win" per proteggere l'equilibrio economico del gioco.</p>
+                        <p class="text-gray-700 mb-4" data-i18n="roadmap.monet_body"></p>
                         <ul class="space-y-2">
-                             <li><strong>Fase 1:</strong> Oggetti cosmetici e servizi di convenienza.</li>
-                             <li><strong>Fase 2:</strong> Abbonamento opzionale con bonus non legati alla potenza.</li>
-                             <li><strong>Fase 3:</strong> Esplorazione di tecnologie Web3 per la proprietà reale degli asset.</li>
+                             <li><strong data-i18n="roadmap.monet_f1"></strong> <span data-i18n="roadmap.monet_f1_desc"></span></li>
+                             <li><strong data-i18n="roadmap.monet_f2"></strong> <span data-i18n="roadmap.monet_f2_desc"></span></li>
+                             <li><strong data-i18n="roadmap.monet_f3"></strong> <span data-i18n="roadmap.monet_f3_desc"></span></li>
                         </ul>
                     </div>
                 </div>
@@ -227,231 +197,25 @@
         </section>
     </main>
 
-	<!-- Audio Toolbar: fixed bottom player for the white paper narration -->
-	<div id="audio-toolbar" class="fixed bottom-0 inset-x-0 bg-[#FDFBF8] border-t border-[#E0D6CC] shadow-lg z-40" style="height:56px;">
-		<div class="container mx-auto px-6 py-2 flex items-center gap-4 h-full">
-			<span class="text-sm text-[#6F4E37] font-semibold whitespace-nowrap">Deep Dive in Echi di Aethel</span>
-			<audio controls preload="none" class="w-full max-w-xl">
-				<source src="assets/white-paper.mp3" type="audio/mpeg">
-				Il tuo browser non supporta l'elemento audio.
-			</audio>
-		</div>
-	</div>
+    <div id="audio-toolbar" class="fixed bottom-0 inset-x-0 bg-[#FDFBF8] border-t border-[#E0D6CC] shadow-lg z-40" style="height:56px;">
+        <div class="container mx-auto px-6 py-2 flex items-center gap-4 h-full">
+            <span class="text-sm text-[#6F4E37] font-semibold whitespace-nowrap" data-i18n="audio_toolbar.title"></span>
+            <audio id="audio-player" controls preload="none" class="w-full max-w-xl">
+                <source id="audio-source" src="#" type="audio/mpeg">
+                <span data-i18n="audio_toolbar.fallback"></span>
+            </audio>
+        </div>
+    </div>
 
     <footer class="bg-[#402E32] text-white py-8" style="padding-bottom:72px;">
         <div class="container mx-auto px-6 text-center">
-            <p>&copy; 2025 Echi di Aethel. Un concetto di gioco per un mondo plasmato dai giocatori.</p>
+            <p data-i18n="footer.copyright"></p>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            
-            const initNavigation = () => {
-                const navLinks = document.querySelectorAll('.nav-link');
-                const sections = document.querySelectorAll('main section');
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            navLinks.forEach(link => {
-                                link.classList.remove('active');
-                                if (link.getAttribute('href').substring(1) === entry.target.id) {
-                                    link.classList.add('active');
-                                }
-                            });
-                        }
-                    });
-                }, { threshold: 0.5 });
-
-                sections.forEach(section => observer.observe(section));
-            };
-
-            const initTabs = () => {
-                const tabButtons = document.querySelectorAll('.tab-button');
-                const tabPanes = document.querySelectorAll('.tab-pane');
-
-                tabButtons.forEach(button => {
-                    button.addEventListener('click', () => {
-                        const tabId = button.dataset.tab;
-
-                        tabButtons.forEach(btn => btn.classList.remove('active'));
-                        button.classList.add('active');
-
-                        tabPanes.forEach(pane => {
-                            pane.classList.add('hidden');
-                            if (pane.id === tabId) {
-                                pane.classList.remove('hidden');
-                            }
-                        });
-                    });
-                });
-            };
-
-            const initCharacterGenerator = () => {
-                const talenti = ["Bonus XP in Pionierismo", "Bonus XP in Mischia", "Bonus XP in Raccolta", "Bonus XP in Fabbricazione", "Bonus XP in Commercio"];
-                const tratti = [
-                    { nome: "Paziente", desc: "Meno fallimenti nelle azioni lunghe." },
-                    { nome: "Audace", desc: "Più chance di critico in zone pericolose." },
-                    { nome: "Pragmatico", desc: "Consuma meno materiali nel crafting." },
-                    { nome: "Saggio", desc: "XP bonus dalle prime scoperte." }
-                ];
-                const ganci = ["Temi l'acqua profonda.", "Porti un antico marchio di gilda.", "Hai un debito da saldare.", "Sogni rovine sommerse."];
-
-                const btn = document.getElementById('genera-destino-btn');
-                const talentoOutput = document.getElementById('talento-output');
-                const trattoOutput = document.getElementById('tratto-output');
-                const gancioOutput = document.getElementById('gancio-output');
-
-                const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
-                
-                const generate = () => {
-                    // FIX: Ho corretto la ReferenceError separando la selezione dei due talenti.
-                    // Seleziona il primo talento
-                    let randomTalent1 = getRandomItem(talenti); 
-
-                    // Filtra l'array per selezionare il secondo talento, assicurandosi che sia diverso dal primo.
-                    let availableTalents = talenti.filter(t => t !== randomTalent1);
-                    let randomTalent2 = getRandomItem(availableTalents);
-                    
-                    const finalTalentText = `${randomTalent1}, ${randomTalent2}`;
-                    const randomTratto = getRandomItem(tratti);
-                    const randomGancio = getRandomItem(ganci);
-
-                    talentoOutput.textContent = finalTalentText.substring(0, 50) + "...";
-                    trattoOutput.textContent = `${randomTratto.nome}: ${randomTratto.desc}`;
-                    gancioOutput.textContent = randomGancio;
-                };
-
-                btn.addEventListener('click', generate);
-                generate();
-            };
-            
-            const initXpChart = () => {
-                const ctx = document.getElementById('xpCurveChart').getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(166, 123, 91, 0.6)');
-                gradient.addColorStop(1, 'rgba(166, 123, 91, 0.1)');
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Liv. 1', 'Liv. 50', 'Liv. 100', 'Liv. 150', 'Liv. 200', 'Liv. 250', 'Liv. 300+'],
-                        datasets: [{
-                            label: 'XP Richiesto per Livello',
-                            data: [100, 5000, 25000, 75000, 200000, 500000, 1500000],
-                            borderColor: '#A67B5B',
-                            backgroundColor: gradient,
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: '#6F4E37',
-                            pointRadius: 5,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    afterBody: function(context) {
-                                        const level = context[0].parsed.x;
-                                        if (level <= 1) return 'Focus: Apprendimento';
-                                        if (level <= 4) return 'Focus: Qualità e Critici';
-                                        return 'Focus: Scoperta e Contratti Elite';
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: { display: true, text: 'XP Totale' }
-                            },
-                            x: {
-                                title: { display: true, text: 'Livello Personaggio (Scala)' }
-                            }
-                        }
-                    }
-                });
-            };
-
-            const initMestieri = () => {
-                const container = document.getElementById('mestieri-container');
-                const mestieriData = [
-                    { base: 'Pioniere', specs: ['Cacciatore', 'Agricoltore'], icon: '🧭' },
-                    { base: 'Lottatore', specs: ['Soldato di Ventura', 'Duellante'], icon: '⚔️' },
-                    { base: 'Raccoglitore', specs: ['Minatore', 'Taglialegna', 'Erborista'], icon: '⛏️' },
-                    { base: 'Fabbricatore', specs: ['Costruttore', 'Fabbro/Sarto'], icon: '🔨' },
-                    { base: 'Viandante', specs: ['Scopritore di Tesori', 'Diplomatico'], icon: '💼' }
-                ];
-
-                container.innerHTML = mestieriData.map(m => `
-                    <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer group min-h-[200px]">
-                        <div class="flex flex-col items-center text-2xl font-bold mb-4">
-                            <span class="text-4xl mb-1 flex-shrink-0">${m.icon}</span><br>
-                            <h4 class="text-[#6F4E37] text-lg leading-tight break-words">${m.base}</h4>
-                        </div>
-                        <div class="h-0 opacity-0 group-hover:h-auto group-hover:opacity-100 transition-all duration-300">
-                           <p class="text-sm text-gray-600 mb-2">Specializzazioni:</p>
-                           <ul class="text-sm space-y-1">
-                            ${m.specs.map(s => `<li class="bg-gray-100 rounded px-2 py-1 break-words">${s}</li>`).join('')}
-                           </ul>
-                        </div>
-                    </div>
-                `).join('');
-            };
-
-            const initContracts = () => {
-                const filter = document.getElementById('contract-filter');
-                const list = document.getElementById('contract-list');
-                const contractsData = [
-                    { title: 'Scorta per la Valle Oscura', req: 'Lottatore (Liv. 50+)', reward: '1500 Oro', type: 'Lottatore' },
-                    { title: 'Commissione: 10 Spade di Ferro', req: 'Fabbricatore (Liv. 25+)', reward: 'Materiali + 500 Oro', type: 'Fabbricatore' },
-                    { title: 'Ricerca: 50 unità di Legno di Quercia', req: 'Raccoglitore (Liv. 30+)', reward: '750 Oro', type: 'Raccoglitore' },
-                    { title: 'Urgente: Fortificazione Avamposto', req: 'Costruttore (Liv. 100+)', reward: '3000 Oro', type: 'Fabbricatore' },
-                    { title: 'Difesa Carovana Commerciale', req: 'Lottatore (Liv. 80+)', reward: '2500 Oro + Bonus', type: 'Lottatore' },
-                    { title: 'Fornitura Erbe Rare', req: 'Erborista (Liv. 120+)', reward: 'Contratto a lungo termine', type: 'Raccoglitore' },
-                ];
-                
-                const renderContracts = (filterValue) => {
-                    const filteredData = filterValue === 'all' 
-                        ? contractsData 
-                        : contractsData.filter(c => c.type === filterValue);
-                    
-                    if (filteredData.length === 0) {
-                        list.innerHTML = `<li class="p-4 text-center text-gray-500">Nessun contratto disponibile per questo mestiere.</li>`;
-                        return;
-                    }
-
-                    list.innerHTML = filteredData.map(c => `
-                        <li class="p-4 hover:bg-gray-50 transition-colors">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h5 class="font-bold text-lg text-[#6F4E37]">${c.title}</h5>
-                                    <p class="text-sm text-gray-500">Requisiti: ${c.req}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-semibold text-green-700">${c.reward}</p>
-                                    <button class="text-sm mt-1 bg-[#A67B5B] text-white px-3 py-1 rounded-md hover:bg-[#8C6239]">Accetta</button>
-                                </div>
-                            </div>
-                        </li>
-                    `).join('');
-                };
-
-                filter.addEventListener('change', (e) => renderContracts(e.target.value));
-                renderContracts('all');
-            };
-
-            initNavigation();
-            initTabs();
-            initCharacterGenerator();
-            initXpChart();
-            initMestieri();
-            initContracts();
-        });
-    </script>
+    <!-- Script esterni: caricati in ordine di dipendenza -->
+    <script src="js/white-paper/config.js"></script>
+    <script src="js/white-paper/translations.js"></script>
+    <script src="js/white-paper/main.js"></script>
 </body>
 </html>
