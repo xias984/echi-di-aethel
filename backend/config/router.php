@@ -17,6 +17,7 @@ class Router {
         // User routes
         $this->routes['POST']['/api/user'] = ['UserController', 'createUser'];
         $this->routes['POST']['/api/user/login'] = ['UserController', 'loginUser'];
+        $this->routes['GET']['/api/user/{id}/resources'] = ['UserController', 'getUserResources'];
         $this->routes['GET']['/api/user/{id}/equipment'] = ['UserController', 'getUserEquipment'];
         $this->routes['GET']['/api/user/{id}/inventory'] = ['UserController', 'getUserInventory'];
         $this->routes['POST']['/api/user/equip'] = ['UserController', 'equipItem'];

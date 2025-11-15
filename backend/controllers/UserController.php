@@ -4,6 +4,7 @@
 class UserController extends BaseController {
     private $userModel;
     private $itemModel;
+    private $resourceModel;
     private $equipmentModel;
     
     public function __construct($pdo) {
@@ -89,6 +90,25 @@ class UserController extends BaseController {
         } catch (Exception $e) {
             error_log("Inventory Error: " . $e->getMessage());
             $this->errorResponse("Internal server error while retrieving inventory.", 500);
+        }
+    }
+
+    /**
+     * Get user resources
+     */
+    public function getUserResources($user_id) {
+        if (!$user_id || !is_numeric($user_id)) {
+            $this->errorResponse("Invalid user ID.");
+        }
+        try {
+            if (!$this->resourceModel) $this->resourceModel = new Resource($this->pdo);
+
+            $resources = $this->resourceModel->getUserResources((int)$user_id);
+
+            $this->jsonResponse(['resources' => $resources]);
+        } catch (Exception $e) {
+            error_log("Resources Error: " . $e->getMessage());
+            $this->errorResponse("Internal server error while retrieving resources.", 500);
         }
     }
 

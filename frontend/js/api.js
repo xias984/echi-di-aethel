@@ -40,6 +40,10 @@ class ApiManager {
         return this.call(`/user/${userId}/equipment`, 'GET');
     }
 
+    getUserResources(userId) {
+        return this.call(`/user/${userId}/resources`, 'GET');
+    }
+
     getUserInventory(userId) {
         return this.call(`/user/${userId}/inventory`, 'GET');
     }

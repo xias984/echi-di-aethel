@@ -53,5 +53,28 @@ class EquipmentRenderer {
         }
         output.html(html);
     }
+
+    /**
+     * Renders the user's non-tradeable resources.
+     * @param {Array<object>} resources - Lista di risorse dall'API.
+     */
+    renderResources(resourcesData) {
+        const output = $('#resources-output');
+        let html = '';
+
+        if (!resourcesData || resourcesData.length === 0) {
+            html = '<p class="text-sm text-[#6F4E37] italic">Nessuna risorsa non tradeabile.</p>';
+        } else {
+            resourcesData.forEach(resource => {
+                html += `
+                    <div class="p-3 border-2 border-[#A67B5B] rounded-lg bg-[#FDFBF8] shadow-sm">
+                        <strong class="text-[#402E32]">${resource.name}</strong>
+                        <span class="text-xs text-[#6F4E37]">${resource.quantity} ${resource.base_resource_type}</span>
+                    </div>
+                `;
+            });
+        }
+        output.html(html);
+    }
 }
 

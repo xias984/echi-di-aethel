@@ -44,6 +44,9 @@ class ProfilePage {
             const equipmentResponse = await this.api.getUserEquipment(userId);
             this.equipmentRenderer.renderEquipment(equipmentResponse.equipment || []);
 
+            const resourcesResponse = await this.api.getUserResources(userId);
+            this.equipmentRenderer.renderResources(resourcesResponse.resources || []);
+
             const inventoryResponse = await this.api.getUserInventory(userId);
             this.equipmentRenderer.renderInventory(inventoryResponse.inventory || []);
 

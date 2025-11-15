@@ -145,6 +145,15 @@ class User extends BaseModel {
         $stmt = $this->pdo->prepare("INSERT INTO user_traits (user_id, trait_id) VALUES (?, ?)");
         $stmt->execute([$user_id, $random_trait_id]);
     }
+
+    /**
+     * Get parent skill ID by child skill ID
+     */
+    public function getParentSkillId($skill_id) {
+        $stmt = $this->pdo->prepare("SELECT parent_skill_id FROM skills WHERE skill_id = ?");
+        $stmt->execute([$skill_id]);
+        return $stmt->fetchColumn();
+    }
     
     /**
      * Get user skills as a map (skill_id => level) for quick lookups
