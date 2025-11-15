@@ -48,6 +48,24 @@ class ApiManager {
         return this.call(`/user/${userId}/inventory`, 'GET');
     }
 
+    getAvailableRecipes(userId) {
+        return this.call(`/crafting/${userId}/recipes`, 'GET');
+    }
+
+    craftItem(userId, recipeId) {
+        // Assicurati che i valori siano numeri
+        const payload = { 
+            user_id: parseInt(userId, 10), 
+            recipe_id: parseInt(recipeId, 10) 
+        };
+        
+        if (!payload.user_id || !payload.recipe_id) {
+            return Promise.reject(new Error('ID utente e ID ricetta devono essere numeri validi'));
+        }
+        
+        return this.call('/crafting/craft', 'POST', payload);
+    }
+
     equipItem(userId, itemId) {
         return this.call('/user/equip', 'POST', { user_id: userId, item_id: itemId });
     }

@@ -1,5 +1,5 @@
 /**
- * Gestisce solo il profilo, skills, equipment e inventory
+ * Gestisce solo il profilo e il caricamento iniziale dei dati
  */
 class ProfilePage {
     constructor(api, stateManager, messageRenderer, profileRenderer, equipmentRenderer, router) {
@@ -14,13 +14,25 @@ class ProfilePage {
 
     setupEventListeners() {
         $('#refresh-btn').on('click', () => this.loadProfile());
-        $(document).on('click', '[data-skill-name]', (e) => {
-            if ($(e.currentTarget).data('skill-name')) {
-                this.handleUseSkill(e);
+        $('#nav-contracts-btn').on('click', () => {
+            if (this.router.pages['contracts']) {
+                this.router.navigateTo('contracts');
             }
         });
-        $(document).on('click', '.inventory-item', (e) => {
-            this.handleEquipItem(e);
+        $('#nav-crafting-btn').on('click', () => {
+            if (this.router.pages['crafting']) {
+                this.router.navigateTo('crafting');
+            }
+        });
+        $('#nav-inventory-btn').on('click', () => {
+            if (this.router.pages['inventory']) {
+                this.router.navigateTo('inventory');
+            }
+        });
+        $('#nav-statistics-btn').on('click', () => {
+            if (this.router.pages['statistics']) {
+                this.router.navigateTo('statistics');
+            }
         });
     }
 
@@ -41,14 +53,13 @@ class ProfilePage {
                 this.router.pages['contracts'].renderContracts(contracts, userId);
             }
 
-            const equipmentResponse = await this.api.getUserEquipment(userId);
-            this.equipmentRenderer.renderEquipment(equipmentResponse.equipment || []);
-
-            const resourcesResponse = await this.api.getUserResources(userId);
-            this.equipmentRenderer.renderResources(resourcesResponse.resources || []);
-
-            const inventoryResponse = await this.api.getUserInventory(userId);
-            this.equipmentRenderer.renderInventory(inventoryResponse.inventory || []);
+            // Aggiorna anche le altre pagine se sono già state caricate
+            if (this.router.pages['inventory']) {
+                this.router.pages['inventory'].loadInventory();
+            }
+            if (this.router.pages['statistics']) {
+                this.router.pages['statistics'].loadStatistics();
+            }
 
             this.profileRenderer.hideLoading();
         } catch (error) {
@@ -57,40 +68,15 @@ class ProfilePage {
         }
     }
 
-    async handleUseSkill(event) {
-        const userId = this.state.getUserId();
-        if (!userId) return;
-        
-        const skillName = $(event.currentTarget).data('skill-name');
-        this.messages.setMessage('action-message', `Esecuzione di ${skillName}...`, 'loading');
-
-        try {
-            const response = await this.api.useSkill(userId, skillName, 5);
-            const type = response.level_up ? 'success' : 'default';
-            this.messages.setMessage('action-message', response.message, type);
-            this.loadProfile();
-        } catch (error) {
-            this.messages.setMessage('action-message', `Errore nell'azione: ${error.message}`, 'error');
-        }
-    }
-
-    async handleEquipItem(event) {
-        const userId = this.state.getUserId();
-        if (!userId) return;
-        
-        const itemId = $(event.currentTarget).data('item-id');
-        this.messages.setMessage('action-message', 'Equipaggiamento in corso...', 'loading');
-
-        try {
-            const response = await this.api.equipItem(userId, itemId);
-            this.messages.setMessage('action-message', response.message, 'success');
-            this.loadProfile();
-        } catch (error) {
-            this.messages.setMessage('action-message', `Errore nell'equipaggiamento: ${error.message}`, 'error');
-        }
-    }
-
     onEnter() {
+        // Nascondi tutti gli altri board
+        $('#crafting-board').addClass('hidden').css('display', 'none');
+        $('#inventory-board').addClass('hidden').css('display', 'none');
+        $('#statistics-board').addClass('hidden').css('display', 'none');
+        $('#welcome-message').addClass('hidden');
+        
+        // Mostra il contract board (rimuovi sia classe che stile inline)
+        $('#contract-board').removeClass('hidden').css('display', '');
         this.loadProfile();
     }
 }

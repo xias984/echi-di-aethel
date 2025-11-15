@@ -7,18 +7,28 @@ class AdminRenderer {
             $('#admin-panel-btn').removeClass('hidden');
         } else {
             $('#admin-panel-btn').addClass('hidden');
-            $('#admin-section').addClass('hidden');
+            $('#admin-section').addClass('hidden').attr('style', 'display: none !important;');
         }
     }
 
     toggleAdminModal() {
-        $('#admin-section').toggleClass('hidden');
+        const modal = $('#admin-section');
+        const isHidden = modal.hasClass('hidden');
+        
+        if (isHidden) {
+            // Mostra il modale: rimuovi classe e stile inline
+            modal.removeClass('hidden').removeAttr('style');
+        } else {
+            // Nascondi il modale: aggiungi classe e stile inline
+            modal.addClass('hidden').attr('style', 'display: none !important;');
+        }
+        
         // Ritorna true se il modal è ora visibile (non hidden)
-        return !$('#admin-section').hasClass('hidden');
+        return !modal.hasClass('hidden');
     }
 
     closeAdminModal() {
-        $('#admin-section').addClass('hidden');
+        $('#admin-section').addClass('hidden').attr('style', 'display: none !important;');
     }
 
     renderAdminUsers(users) {

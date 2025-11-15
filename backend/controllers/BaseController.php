@@ -48,8 +48,11 @@ class BaseController {
      * Validate required fields
      */
     protected function validateRequired($data, $required_fields) {
+        if (!is_array($data)) {
+            $this->errorResponse("Invalid JSON data.");
+        }
         foreach ($required_fields as $field) {
-            if (!isset($data[$field]) || empty($data[$field])) {
+            if (!isset($data[$field]) || $data[$field] === '' || $data[$field] === null) {
                 $this->errorResponse("Field '{$field}' is required.");
             }
         }

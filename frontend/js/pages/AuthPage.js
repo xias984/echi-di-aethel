@@ -40,8 +40,13 @@ class AuthPage {
         $('#creation-form').addClass('hidden');
         $('#user-menu').removeClass('hidden');
         $('#sidebar').removeClass('hidden');
-        $('#contract-board').removeClass('hidden');
         $('#welcome-message').addClass('hidden');
+        
+        // Nascondi tutti i board tranne quello che verrà mostrato dalla pagina
+        $('#crafting-board').addClass('hidden').css('display', 'none');
+        $('#inventory-board').addClass('hidden').css('display', 'none');
+        $('#statistics-board').addClass('hidden').css('display', 'none');
+        // Il contract-board verrà mostrato da ProfilePage.onEnter()
     }
 
     async handleLogin() {
@@ -95,11 +100,22 @@ class AuthPage {
             this.state.clearUser();
             this.toggleLoginForms(true);
             $('#login-username').val('');
+            // Nascondi il pulsante admin quando si fa logout
+            if (this.adminRenderer) {
+                this.adminRenderer.showAdminSection(false);
+            }
             this.router.navigateTo('auth');
         }
     }
 
     onEnter() {
+        // Nascondi tutti i board all'inizio
+        $('#crafting-board').addClass('hidden');
+        $('#contract-board').addClass('hidden');
+        $('#inventory-board').addClass('hidden');
+        $('#statistics-board').addClass('hidden');
+        $('#admin-section').addClass('hidden');
+        
         if (this.state.getUserId()) {
             this.showAppSections();
         } else {

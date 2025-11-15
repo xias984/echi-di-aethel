@@ -1,0 +1,37 @@
+<div id="contract-board" class="hidden" style="display: none !important;">
+    <h2 class="text-3xl font-bold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Bacheca degli Echi</h2>
+    <p class="text-[#6F4E37] mb-4 italic">Il cuore sociale del gioco, dove i mestieri si incontrano</p>
+    <p id="contract-message" class="hidden mt-3 p-2 rounded"></p>
+    
+    <button id="toggle-create-form-btn" class="bg-[#6F4E37] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors cursor-pointer mb-4 font-semibold border border-[#A67B5B]">
+        + Pubblica Nuovo Contratto
+    </button>
+
+    <div id="contract-create" class="hidden p-4 border-2 border-[#A67B5B] rounded-lg mb-6 bg-[#FDFBF8] shadow-md">
+        <h3 class="text-lg font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Pubblica un Contratto</h3>
+        <div class="space-y-3">
+            <input type="text" id="contract-title" placeholder="Titolo del Contratto (es. Scorta Armata)" 
+                class="w-full px-3 py-2 border border-[#A67B5B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#A67B5B] bg-[#FDFBF8] text-[#402E32]">
+            <div class="grid grid-cols-2 gap-3">
+                <select id="required-skill-name" disabled
+                    class="px-3 py-2 border border-[#A67B5B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#A67B5B] bg-[#EAE0D5] text-[#402E32]">
+                    <option value="">Seleziona Mestiere Richiesto</option>
+                </select>
+                <input type="number" id="required-level" placeholder="Livello Minimo Richiesto" min="1" value="1" 
+                    class="px-3 py-2 border border-[#A67B5B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#A67B5B] bg-[#FDFBF8] text-[#402E32]">
+            </div>
+            <input type="number" id="reward-amount" placeholder="Ricompensa (Oro Simulato)" min="1" 
+                class="w-full px-3 py-2 border border-[#A67B5B] rounded-md focus:outline-none focus:ring-2 focus:ring-[#A67B5B] bg-[#FDFBF8] text-[#402E32]">
+            <button id="create-contract-btn" class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors cursor-pointer font-semibold">
+                Pubblica Contratto (Escrow)
+            </button>
+        </div>
+    </div>
+
+    <h3 class="text-xl font-semibold text-[#402E32] mt-6 mb-4" style="font-family: 'Cinzel', serif;">Contratti Disponibili</h3>
+    <p class="text-sm text-[#6F4E37] mb-4 italic">Filtrati per il tuo livello di competenza</p>
+    <div id="contracts-list-output" class="text-[#6F4E37]">
+        Caricamento contratti...
+    </div>
+</div>
+

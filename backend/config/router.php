@@ -25,6 +25,10 @@ class Router {
         
         // Action routes
         $this->routes['POST']['/api/action/use'] = ['ActionController', 'useSkill'];
+
+        // Crafting routes
+        $this->routes['GET']['/api/crafting/{id}/recipes'] = ['CraftingController', 'getAvailableRecipes'];
+        $this->routes['POST']['/api/crafting/craft'] = ['CraftingController', 'craftItem'];
         
         // Contract routes
         $this->routes['POST']['/api/contracts'] = ['ContractController', 'createContract'];

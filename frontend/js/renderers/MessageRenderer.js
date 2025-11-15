@@ -15,6 +15,11 @@ class MessageRenderer {
         const modalContent = $('#message-modal-content');
         const modalText = $('#message-modal-text');
         
+        // Rimuovi lo stile inline che nasconde il modale (rimuovi l'attributo style completamente)
+        modal.removeClass('hidden').removeAttr('style');
+        
+        // Reset del contenuto per l'animazione
+        modalContent.removeClass('opacity-0 opacity-100 scale-95 scale-100');
         modalContent.removeClass('border-[#A67B5B] border-[#D32F2F]');
         modalText.removeClass('text-[#6F4E37] text-[#8C5A3C] text-[#402E32]');
         
@@ -24,12 +29,17 @@ class MessageRenderer {
         modalContent.addClass(borderClass);
         modalText.addClass(textClass).text(msg);
         
-        modal.removeClass('hidden');
-        modalContent.removeClass('opacity-0 scale-95').addClass('opacity-100 scale-100');
+        // Forza il reflow per assicurare che l'animazione funzioni
+        modal[0].offsetHeight;
+        
+        // Mostra il contenuto con animazione
+        modalContent.addClass('opacity-100 scale-100');
         
         setTimeout(() => {
             modalContent.removeClass('opacity-100 scale-100').addClass('opacity-0 scale-95');
-            setTimeout(() => modal.addClass('hidden'), 300);
+            setTimeout(() => {
+                modal.addClass('hidden').attr('style', 'display: none !important;');
+            }, 300);
         }, 3000);
     }
 

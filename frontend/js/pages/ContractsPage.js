@@ -77,6 +77,14 @@ class ContractsPage {
     }
 
     onEnter() {
+        // Nascondi tutti gli altri board
+        $('#crafting-board').addClass('hidden').css('display', 'none');
+        $('#inventory-board').addClass('hidden').css('display', 'none');
+        $('#statistics-board').addClass('hidden').css('display', 'none');
+        $('#welcome-message').addClass('hidden');
+        
+        // Mostra il contract board (rimuovi sia classe che stile inline)
+        $('#contract-board').removeClass('hidden').css('display', '');
         this.loadContracts();
     }
 }
