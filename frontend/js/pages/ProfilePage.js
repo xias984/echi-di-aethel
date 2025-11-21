@@ -91,6 +91,15 @@ class ProfilePage {
     }
 
     onEnter() {
+        const userId = this.state.getUserId();
+        if (!userId) {
+            this.router.navigateTo('auth');
+            return;
+        }
+        
+        $('#admin-page-content').addClass('hidden');
+        $('#contract-board').removeClass('hidden');
+        
         this.loadProfile();
     }
 }

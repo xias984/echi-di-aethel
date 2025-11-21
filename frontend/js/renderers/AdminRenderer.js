@@ -11,16 +11,6 @@ class AdminRenderer {
         }
     }
 
-    toggleAdminModal() {
-        $('#admin-section').toggleClass('hidden');
-        // Ritorna true se il modal è ora visibile (non hidden)
-        return !$('#admin-section').hasClass('hidden');
-    }
-
-    closeAdminModal() {
-        $('#admin-section').addClass('hidden');
-    }
-
     renderAdminUsers(users) {
         if (!users || users.length === 0) {
             $('#admin-users-content').html('<p class="text-[#6F4E37] py-4">Nessun utente trovato.</p>');

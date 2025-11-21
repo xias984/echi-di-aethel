@@ -28,6 +28,10 @@ class App {
             this.router.registerPage('contracts', this.contractsPage);
             this.router.registerPage('admin', this.adminPage);
 
+            $('#admin-panel-btn').on('click', () => {
+                this.router.navigateTo('admin');
+            });
+
             // Mostra/nascondi sezione admin in base ai permessi
             adminRenderer.showAdminSection(this.state.getIsAdmin());
 

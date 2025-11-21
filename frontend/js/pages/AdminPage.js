@@ -2,28 +2,16 @@
  * Gestisce solo le funzionalità admin
  */
 class AdminPage {
-    constructor(api, stateManager, messageRenderer, adminRenderer) {
+    constructor(api, stateManager, messageRenderer, adminRenderer, router) {
         this.api = api;
         this.state = stateManager;
         this.messages = messageRenderer;
         this.adminRenderer = adminRenderer;
+        this.router = this.router;
         this.setupEventListeners();
     }
 
     setupEventListeners() {
-        $('#admin-panel-btn').on('click', () => {
-            const isNowVisible = this.adminRenderer.toggleAdminModal();
-            // Carica i dati quando si apre il modal (quando diventa visibile)
-            if (isNowVisible) {
-                this.loadAdminData();
-            }
-        });
-        $('#close-admin-btn').on('click', () => this.adminRenderer.closeAdminModal());
-        $('#admin-section').on('click', (e) => {
-            if (e.target.id === 'admin-section') {
-                this.adminRenderer.closeAdminModal();
-            }
-        });
 
         $('#admin-refresh-btn').on('click', () => this.loadAdminData());
         $('#admin-toggle-users-btn').on('click', () => $('#admin-users-section').toggleClass('hidden'));
@@ -194,8 +182,16 @@ class AdminPage {
     }
 
     onEnter() {
+        $('#contract-board').addClass('hidden');
+        $('#welcome-message').addClass('hidden');
+        $('#sidebar').removeClass('hidden');
+        $('#admin-page-content').removeClass('hidden'); 
+
         if (this.state.getIsAdmin()) {
             this.loadAdminData();
+        } else {
+            this.messages.setMessage('action-message', 'Accesso negato. Privilegi di Admin richiesti.', 'error');
+            this.router.navigateTo('profile'); 
         }
     }
 }

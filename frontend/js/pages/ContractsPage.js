@@ -77,6 +77,11 @@ class ContractsPage {
     }
 
     onEnter() {
+        const userId = this.state.getUserId();
+        if (!userId) return;
+
+        $('#admin-page-content').addClass('hidden');
+        $('#contract-board').removeClass('hidden');
         this.loadContracts();
     }
 }
