@@ -22,6 +22,21 @@ class ProfilePage {
         $(document).on('click', '.inventory-item', (e) => {
             this.handleEquipItem(e);
         });
+
+        $('#character-tabs .tab-button').on('click', (e) => this.handleTabNavigation(e));
+        $('#nav-profile-btn').on('click', () => this.router.navigateTo('profile'));
+    }
+
+    handleTabNavigation(event) {
+        const targetTabId = $(event.currentTarget).data('tab');
+
+        // Aggiorna classi bottoni
+        $('#character-tabs .tab-button').removeClass('active border-[#A67B5B]').css('border-bottom-width', '0');
+        $(event.currentTarget).addClass('active border-[#A67B5B]').css('border-bottom-width', '2px');
+
+        // Nasconde tutti i pannelli e mostra quello selezionato
+        $('#character-tab-content .tab-pane').addClass('hidden');
+        $(`#${targetTabId}`).removeClass('hidden');
     }
 
     async loadProfile() {
@@ -98,7 +113,11 @@ class ProfilePage {
         }
         
         $('#admin-page-content').addClass('hidden');
-        $('#contract-board').removeClass('hidden');
+        $('#contract-board').addClass('hidden');
+        $('#welcome-message').addClass('hidden');
+        $('#sidebar').removeClass('hidden');
+        $('#character-page-content').removeClass('hidden');
+        $('#character-tabs .tab-button').first().trigger('click');
         
         this.loadProfile();
     }

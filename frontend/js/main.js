@@ -76,7 +76,16 @@ $(document).ready(() => {
             return;
         }
         
-        new App();
+        const app = new App();
+
+        app.state.clearUser();
+
+        $('#nav-contracts-btn').on('click', () => {
+            app.router.navigateTo('contracts');
+        });
+        $('#nav-profile-btn').on('click', () => {
+            app.router.navigateTo('profile');
+        });
     } catch (error) {
         alert('Errore durante il caricamento dell\'applicazione. Ricarica la pagina.');
     }

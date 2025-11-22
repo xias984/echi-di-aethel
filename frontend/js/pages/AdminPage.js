@@ -183,8 +183,8 @@ class AdminPage {
 
     onEnter() {
         $('#contract-board').addClass('hidden');
+        $('#character-page-content').addClass('hidden');
         $('#welcome-message').addClass('hidden');
-        $('#sidebar').removeClass('hidden');
         $('#admin-page-content').removeClass('hidden'); 
 
         if (this.state.getIsAdmin()) {

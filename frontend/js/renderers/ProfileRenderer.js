@@ -4,7 +4,7 @@
 class ProfileRenderer {
     renderProfile(profileData) {
         $('#profile-name').text(profileData.username);
-        $('#navbar-username').text(profileData.username);
+        $('#page-profile-name').text(profileData.username);
 
         if (profileData.trait) {
             $('#profile-trait').text(profileData.trait.name);

@@ -87,57 +87,33 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="hidden w-80 bg-[#EAE0D5] shadow-lg overflow-y-auto border-r-2 border-[#A67B5B]">
             <div class="p-6">
-                <!-- Profile Section -->
                 <div id="sidebar-profile" class="mb-6">
+                    <!-- Username Section -->
                     <h2 class="text-2xl font-bold text-[#402E32] mb-4 border-b-2 border-[#A67B5B] pb-2" style="font-family: 'Cinzel', serif;">
                         <span id="profile-name" class="text-[#6F4E37]"></span>
                     </h2>
-                    
-                    <!-- Loading State -->
-                    <div id="profile-loading" class="hidden p-5 text-center">
-                        <p class="bg-[#FDFBF8] text-[#6F4E37] p-3 rounded-md border border-[#A67B5B]">Caricamento profilo...</p>
+
+                    <!-- Trait Section -->
+                    <div class="mb-6 p-4 bg-[#FDFBF8] rounded-lg border-2 border-[#A67B5B] shadow-md">
+                        <p class="mb-2">
+                            <strong class="text-[#402E32]">Tratto Caratteriale:</strong> 
+                            <span id="profile-trait" class="text-[#6F4E37] font-bold"></span>
+                        </p>
+                        <p id="trait-description" class="text-sm text-[#6F4E37]"></p>
                     </div>
-                    
-                    <!-- Profile Content -->
-                    <div id="profile-content" class="hidden">
-                        <!-- Trait Section -->
-                        <div class="mb-6 p-4 bg-[#FDFBF8] rounded-lg border-2 border-[#A67B5B] shadow-md">
-                            <p class="mb-2">
-                                <strong class="text-[#402E32]">Tratto Caratteriale:</strong> 
-                                <span id="profile-trait" class="text-[#6F4E37] font-bold"></span>
-                            </p>
-                            <p id="trait-description" class="text-sm text-[#6F4E37]"></p>
-                        </div>
-                        
-                        <!-- Refresh Button -->
-                        <button id="refresh-btn" class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-6 font-semibold">
-                            Aggiorna Statistiche
-                        </button>
+    
+                    <!-- Navigation Buttons -->
+                    <button id="nav-profile-btn" class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-4 font-semibold">
+                        Personaggio
+                    </button>
 
-                        <div>
-                            <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Risorse Grezze</h3>
-                            <div id="resources-output" class="space-y-3 mb-6"></div>
-                        </div>
-
-                        <div>
-                            <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Equipaggiamento</h3>
-                            <div id="equipment-output" class="space-y-3 mb-6"></div>
-                        </div>
-
-                        <div>
-                            <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Inventario (Click per Equipaggiare)</h3>
-                            <div id="inventory-output" class="space-y-3 mb-6"></div>
-                        </div>
-                        
-                        <!-- Skills Section -->
-                        <div>
-                            <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Livelli di Mestiere e Azioni</h3>
-                            <div id="action-message" class="hidden mt-3 p-2 rounded mb-4"></div>
-                            <div id="skill-output" class="space-y-3">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <button id="nav-contracts-btn" class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-6 font-semibold">
+                        Bacheca Contratti
+                    </button>
+    
+                    <button id="refresh-btn" class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-6 font-semibold">
+                        Aggiorna Statistiche
+                    </button>
             </div>
         </aside>
 
@@ -146,10 +122,60 @@
             <div class="container mx-auto p-6">
                 <!-- Content will be displayed here -->
                 <div id="main-content">
+                    
+                    <!-- Loading State -->
+                    <div id="profile-loading" class="hidden p-5 text-center">
+                        <p class="bg-[#FDFBF8] text-[#6F4E37] p-3 rounded-md border border-[#A67B5B]">Caricamento profilo...</p>
+                    </div>
+
                     <!-- Login/Register prompts when not logged in -->
                     <div id="welcome-message" class="text-center py-20">
                         <h2 class="text-4xl font-bold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Benvenuto in Echi di Aethel</h2>
                         <p class="text-[#6F4E37] text-lg">Accedi o registrati per iniziare la tua avventura</p>
+                    </div>
+
+                    <!-- Character Page Content -->
+                    <div id="character-page-content" class="hidden">
+                        <h2 class="text-3xl font-bold text-[#402E32] mb-4 border-b-2 border-[#A67B5B] pb-2" style="font-family: 'Cinzel', serif;">
+                            Personaggio: <span id="page-profile-name" class="text-[#6F4E37]"></span>
+                        </h2>
+        
+                        <div id="character-tabs" class="flex border-b border-[#A67B5B] mb-6">
+                            <button class="tab-button active px-4 py-2 font-semibold text-[#6F4E37] border-b-2 border-[#A67B5B]" data-tab="tab-stats">Statistiche</button>
+                            <button class="tab-button px-4 py-2 font-semibold text-[#6F4E37]" data-tab="tab-inventory">Inventario</button>
+                            <button class="tab-button px-4 py-2 font-semibold text-[#6F4E37]" data-tab="tab-resources">Risorse</button>
+                        </div>
+        
+                        <div id="character-tab-content" class="space-y-6">
+                            <div class="tab-pane active" id="tab-stats">
+                                <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Livelli di Mestiere e Azioni</h3>
+                                <div id="action-message" class="hidden mt-3 p-2 rounded mb-4"></div>
+                                <div id="skill-output" class="space-y-3">
+                                    </div>
+                            </div>
+        
+                            <div class="tab-pane hidden" id="tab-inventory">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Equipaggiamento Attuale</h3>
+                                    <div id="equipment-output" class="space-y-3 mb-6">
+                                        </div>
+                                </div>
+        
+                                <div>
+                                    <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Inventario (Click per Equipaggiare)</h3>
+                                    <div id="inventory-output" class="space-y-3 mb-6">
+                                        </div>
+                                </div>
+                            </div>
+        
+                            <div class="tab-pane hidden" id="tab-resources">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Risorse Grezze</h3>
+                                    <div id="resources-output" class="space-y-3 mb-6">
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Contract Board (initially hidden) -->

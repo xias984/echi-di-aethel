@@ -81,6 +81,7 @@ class ContractsPage {
         if (!userId) return;
 
         $('#admin-page-content').addClass('hidden');
+        $('#character-page-content').addClass('hidden');
         $('#contract-board').removeClass('hidden');
         this.loadContracts();
     }

@@ -32,6 +32,7 @@ class AuthPage {
         $('#admin-page-content').addClass('hidden');
         $('#sidebar').addClass('hidden');
         $('#contract-board').addClass('hidden');
+        $('#character-page-content').addClass('hidden');
         $('#welcome-message').removeClass('hidden');
         $('#user-menu').addClass('hidden');
     }
