@@ -76,6 +76,19 @@ class ApiManager {
         return this.call(`/contracts/${contractId}/accept`, 'POST', { acceptor_id: acceptorId });
     }
 
+    deliverContract(contractId, executorId, itemsToDeliver) {
+        return this.call(`/contracts/${contractId}/deliver`, 'POST', {
+            executor_id: executorId,
+            items_to_deliver: itemsToDeliver
+        });
+    }
+
+    completeContract(contractId, executorId) {
+        return this.call(`/contracts/${contractId}/complete`, 'POST', {
+            executor_id: executorId
+        });
+    }
+
     createContract(proposerId, title, requiredSkillName, requiredLevel, rewardAmount) {
         return this.call('/contracts', 'POST', {
             proposer_id: proposerId,

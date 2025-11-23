@@ -24,6 +24,9 @@ class ContractsRenderer {
                 const is_proposer = c.proposer_id == currentUserId;
                 const status_text = 'APERTO';
                 const status_color = 'bg-[#EAE0D5] text-[#6F4E37] border-[#A67B5B]';
+
+                // Controlla se è un contratto di consegna (simulato per MVP)
+                const isDeliveryContract = c.title.includes("Ricerca") || c.title.includes("Commissione");
                 
                 let action_button = '';
                 if (is_proposer) {
@@ -31,12 +34,15 @@ class ContractsRenderer {
                 } else {
                     action_button = `<button class="accept-contract-btn bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors cursor-pointer font-semibold border border-[#6F4E37]" data-contract-id="${c.contract_id}">Accetta Contratto</button>`;
                 }
+
+                // Aggiunge un indicatore visivo se è un contratto di consegna
+                const deliveryIcon = isDeliveryContract ? '📦' : '🛡️';
                 
                 openHtml += `
                     <div class="flex justify-between items-center p-4 border-2 border-[#A67B5B] rounded-lg bg-[#FDFBF8] hover:shadow-lg transition-shadow shadow-sm">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
-                                <strong class="text-[#402E32] text-lg">${c.title}</strong>
+                                <strong class="text-[#402E32] text-lg">${deliveryIcon} ${c.title}</strong>
                                 <span class="px-2 py-1 rounded text-xs font-semibold border ${status_color}">${status_text}</span>
                             </div>
                             <div class="text-sm text-[#6F4E37]">
@@ -62,22 +68,36 @@ class ContractsRenderer {
             acceptedContracts.forEach(c => {
                 const status_text = c.status === 'ACCEPTED' ? 'ACCETTATO' : c.status;
                 const status_color = 'bg-[#D3C5B6] text-[#402E32] border-[#8C6239]';
+                const is_proposer = c.proposer_id == currentUserId;
+
+                // Controlla se il contratto è di consegna o servizio (per la visualizzazione dei pulsanti)
+                const isDeliveryContract = c.title.includes("Ricerca") || c.title.includes("Commissione");
+                const deliveryIcon = isDeliveryContract ? '📦' : '🛡️';
                 
                 // Mostra il pulsante Chat per i contratti accettati
-                const action_button = `<button class="open-chat-btn bg-[#A67B5B] hover:bg-[#8C6239] text-white px-3 py-1 rounded-md transition-colors cursor-pointer font-semibold border border-[#6F4E37]" data-contract-id="${c.contract_id}" data-proposer-id="${c.proposer_id}" data-acceptor-id="${c.accepted_by_id}">Chat</button>`;
+                const action_button = `<button class="open-chat-btn bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors cursor-pointer font-semibold border border-[#6F4E37]" data-contract-id="${c.contract_id}" data-proposer-id="${c.proposer_id}" data-acceptor-id="${c.accepted_by_id}">Chat</button>`;
                 
                 // Determina il nome dell'accettatore se disponibile
                 const acceptorName = c.acceptor_name || 'Sconosciuto';
-                const is_proposer = c.proposer_id == currentUserId;
                 const partnerInfo = is_proposer 
                     ? `Accettato da: <span class="text-[#8C6239]">${acceptorName}</span>`
                     : `Proponente: <span class="text-[#8C6239]">${c.proposer_name}</span>`;
+
+                // Nuovi pulsanti di azione per l'esecutore
+                let primary_action = '';
+                if (c.status === 'ACCEPTED' && !is_proposer && isDeliveryContract) {
+                    // Se sei l'esecutore e devi consegnare
+                    primary_action = `<button class="deliver-contract-btn bg-[#8C6239] hover:bg-[#6F4E37] text-white px-4 py-2 rounded-md transition-colors cursor-pointer font-semibold border border-[#6F4E37]" data-contract-id="${c.contract_id}">Consegna Oggetti</button>`;
+                } else if (c.status  === 'ACCEPTED' && !is_proposer && !isDeliveryContract) {
+                    // Se sei l'esecutore e devi completare il servizio
+                    primary_action = `<button class="complete-contract-btn bg-[#8C6239] hover:bg-[#6F4E37] text-white px-4 py-2 rounded-md transition-colors cursor-pointer font-semibold border border-[#6F4E37]" data-contract-id="${c.contract_id}">Completa Servizio</button>`;
+                }
                 
                 acceptedHtml += `
                     <div class="flex justify-between items-center p-4 border-2 border-[#8C6239] rounded-lg bg-[#FDFBF8] hover:shadow-lg transition-shadow shadow-sm">
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
-                                <strong class="text-[#402E32] text-lg">${c.title}</strong>
+                                <strong class="text-[#402E32] text-lg">${deliveryIcon} ${c.title}</strong>
                                 <span class="px-2 py-1 rounded text-xs font-semibold border ${status_color}">${status_text}</span>
                             </div>
                             <div class="text-sm text-[#6F4E37]">
@@ -88,7 +108,7 @@ class ContractsRenderer {
                         </div>
                         <div class="text-right ml-4">
                             <div class="font-bold text-[#6F4E37] text-lg mb-2">${c.reward_amount} Oro</div>
-                            <div>${action_button}</div>
+                            <div>${primary_action} ${action_button}</div>
                         </div>
                     </div>
                 `;

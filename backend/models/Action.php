@@ -33,23 +33,6 @@ class Action extends BaseModel {
             // Get equipped tool for bonus
             $tool_bonus = $this->getEquippedToolBonus($user_id, $skill_data['skill_id']);
             
-            /*
-            // Calculate XP gain
-            $xp_result = $this->calculateXPGain($trait_modifier, $tool_bonus);
-            
-            // Update skill XP
-            $new_total_xp = $skill_data['current_xp'] + $xp_result['xp_gain'];
-            $old_level_data = $this->calculateLevelAndXP($skill_data['current_xp']);
-            $new_level_data = $this->calculateLevelAndXP($new_total_xp);
-            
-            $level_up = $new_level_data['level'] > $old_level_data['level'];
-            
-            // Update database
-            $this->update($skill_data['user_skill_id'], [
-                'current_xp' => $new_total_xp,
-                'current_level' => $new_level_data['level']
-            ]);
-            */
             // Core action processing: XP gain and Resource drop
             $xp_result = $this->processAction($user_id, $skill_data, $trait_modifier, $tool_bonus);
             $this->commit();

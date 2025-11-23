@@ -16,6 +16,8 @@ class ContractsPage {
         $('#toggle-create-form-btn').on('click', () => $('#contract-create').toggleClass('hidden'));
         $('#create-contract-btn').on('click', () => this.handleCreateContract());
         $(document).on('click', '.accept-contract-btn', (e) => this.handleAcceptContract(e));
+        $(document).on('click', '.deliver-contract-btn', (e) => this.handleDeliverContract(e));
+        $(document).on('click', '.complete-contract-btn', (e) => this.handleCompleteContract(e));
 
         // Nuovi listeners per la Chat
         $(document).on('click', '.open-chat-btn', (e) => this.handleOpenChat(e));
@@ -152,6 +154,56 @@ class ContractsPage {
             this.loadContracts();
         } catch (error) {
             this.messages.setMessage('contract-message', `Errore: ${error.message}`, 'error');
+        }
+    }
+
+    async handleDeliverContract(event) {
+        const userId = this.state.getUserId();
+        if (!userId) return;
+
+        const contractId = $(event.currentTarget).data('contract-id');
+
+        // Per l'MVP, assumiamo che i contratti siano statici e richiedono 10x Tronco Greggio
+        const requiredItems = [{ item_id: 1, quantity: 10, name: 'Tronco Greggio' }]; // item_id 1 = Tronco Greggio
+
+        if (!confirm(`Sei sicuro di voler consegnare le risorse per il contratto #${contractId}? Questa azione trasferirà ${requiredItems[0].quantity}x ${requiredItems[0].name} al proponente.`)) {
+            return;
+        }
+
+        this.messages.setMessage('contract-message', 'Verifica inventario e consegna in corso...', 'loading');
+
+        try {
+            // Chiamata all'API di consegna
+            const response = await this.api.deliverContract(contractId, userId, [{
+                item_id: requiredItems[0].item_id,
+                quantity: requiredItems[0].quantity
+            }]);
+
+            this.messages.setMessage('contract-message', response.message, 'success');
+            this.loadContracts();
+        } catch (error) {
+            this.messages.setMessage('contract-message', `Errore nella consegna: ${error.message}`, 'error');
+        }
+    }
+
+    async handleCompleteContract(event) {
+        const userId = this.state.getUserId();
+        if (!userId) return;
+
+        const contractId = $(event.currentTarget).data('contract-id');
+
+        if (!confirm(`Sei sicuro di voler completare il servizio per il contratto #${contractId}?`)) {
+            return;
+        }
+
+        this.messages.setMessage('contract-message', 'Completamento servizio in corso...', 'loading');
+
+        try {
+            const response = await this.api.completeContract(contractId, userId);
+            this.messages.setMessage('contract-message', response.message, 'success');
+            this.loadContracts();
+        } catch (error) {
+            this.messages.setMessage('contract-message', `Errore nel completamento: ${error.message}`, 'error');
         }
     }
 

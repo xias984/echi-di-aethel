@@ -24,7 +24,14 @@ class Equipment extends BaseModel {
     }
     
     public function getEquippedToolForSkill($user_id, $skill_id) {
-        // Trova lo strumento equipaggiato valido per la skill (o la sua genitrice)
+        // Trova lo strumento equipaggiato valido per la skill (o la sua genitrice/figlia)
+        // Ottiene anche tutte le skill figlie/genitrice per il controllo di compatibilità
+        $compatible_skill_ids = $this->itemModel->getCompatibleSkillIds($skill_id);
+        if (empty($compatible_skill_ids)) {
+            $compatible_skill_ids = [(int)$skill_id]; // Fallback
+        }
+        $placeholders = rtrim(str_repeat('?,', count($compatible_skill_ids)), ',');
+
         $stmt = $this->pdo->prepare("
             SELECT i.bonus_crit_chance, i.equipment_slot
             FROM user_equipment ue
@@ -33,11 +40,13 @@ class Equipment extends BaseModel {
             WHERE ue.user_id = ?
             AND i.item_type = 'TOOL'
             AND ue.slot_type = 'TOOL_MAIN' -- Assumiamo solo lo slot principale per i tool
-            AND (i.required_skill_id = ? OR s.parent_skill_id = ?)
+            AND i.required_skill_id IN ($placeholders)
             LIMIT 1
         ");
-        // Verifica se la skill corrente è la required_skill_id O se il parent_skill_id dello strumento corrisponde alla required_skill_id dello strumento
-        $stmt->execute([$user_id, $skill_id, $skill_id]);
+        
+        $params = array_merge([(int)$user_id], $compatible_skill_ids);
+        $stmt->execute($params);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
@@ -52,38 +61,30 @@ class Equipment extends BaseModel {
             throw new Exception("Questo oggetto non può essere equipaggiato.");
         }
         
-        // Controlla i requisiti di livello (Assumendo che Item.required_level sia sempre 1 per semplicità)
+        // Controlla i requisiti di skill (se l'item richiede una skill specifica)
         if ($item['required_skill_id']) {
-            $user_skills = $this->userModel->getUserSkillsMap($user_id); 
-            $user_level = $user_skills[$item['required_skill_id']] ?? 0;
-            
-            // Per MVP, assumo che il livello richiesto per il tool sia 1 (o sia definito nell'item).
-            // Se l'utente non ha la skill, non può equipaggiare.
+            $user_skills = $this->userModel->getUserSkillsMap($user_id);
+            $skill_id = (int)$item['required_skill_id'];
+
+            // Verifica il livello effettivo della skill richiesta (es. Taglialegna)
+            $user_level = $user_skills[$skill_id] ?? 0;
+            // Se l'utente non ha la skill richiesta (livello 0), non può equipaggiare
             if ($user_level < 1) {
-                 throw new Exception("Non soddisfi i requisiti di skill per equipaggiare: {$item['name']}.");
+                throw new Exception("Non soddisfi i requisiti di skill per equipaggiare: {$item['name']}.");
             }
         }
-
-        try {
-            $this->beginTransaction();
-            
-            // 1. Rimuove il vecchio oggetto dallo slot (lo riporta logicamente nell'inventario)
-            $stmt = $this->pdo->prepare("DELETE FROM user_equipment WHERE user_id = ? AND slot_type = ?");
-            $stmt->execute([$user_id, $slot_type]);
-            
-            // 2. Inserisce il nuovo oggetto nello slot (o aggiorna se lo slot era vuoto/aggiornato)
-            $stmt = $this->pdo->prepare("
-                INSERT INTO user_equipment (user_id, item_id, slot_type) VALUES (?, ?, ?)
-            ");
-            $stmt->execute([$user_id, $item_id, $slot_type]);
-            
-            $this->commit();
-            return $item;
-            
-        } catch (Exception $e) {
-            $this->rollback();
-            throw $e;
-        }
+        
+        // Equipaggia l'item: se esiste già un item in quello slot, lo sostituisce
+        // La PRIMARY KEY è (user_id, slot_type), quindi usiamo INSERT ... ON CONFLICT UPDATE
+        $stmt = $this->pdo->prepare("
+            INSERT INTO {$this->table} (user_id, item_id, slot_type)
+            VALUES (?, ?, ?)
+            ON CONFLICT (user_id, slot_type)
+            DO UPDATE SET item_id = EXCLUDED.item_id
+        ");
+        $stmt->execute([(int)$user_id, (int)$item_id, $slot_type]);
+        
+        return $item;
     }
 }
 ?>

@@ -3,10 +3,14 @@
 
 class ContractController extends BaseController {
     private $contractModel;
+    private $itemModel;
+    private $userModel;
     
     public function __construct($pdo) {
         parent::__construct($pdo);
         $this->contractModel = new Contract($pdo);
+        $this->itemModel = new Item($pdo);
+        $this->userModel = new User($pdo);
     }
     
     /**
@@ -86,6 +90,100 @@ class ContractController extends BaseController {
             } else {
                 $this->errorResponse("Error accepting contract: " . $e->getMessage(), 500);
             }
+        }
+    }
+
+    /**
+     * Deliver items and mark contract as COMPLETED (for resource delivery contracts)
+     */
+    public function deliverContract($contract_id) {
+        $data = $this->getJsonInput();
+        $this->validateRequired($data, ['executor_id', 'items_to_deliver']);
+
+        $executor_id = (int)$data['executor_id'] ?? 0;
+        $contract_id = (int)($contract_id ?? 0);
+        $items_to_deliver = $data['items_to_deliver'] ?? []; // [{item_id: X, quantity: Y}]
+
+        if (empty($items_to_deliver)) {
+            $this->errorResponse("Devi specificare gli oggetti e la quantità da consegnare.");
+        }
+
+        try {
+            $this->contractModel->beginTransaction();
+
+            // 1. Verifica che il contratto sia ACCEPTED e l'utente sia l'esecutore
+            $contract = $this->contractModel->findById($contract_id);
+            if (!$contract || $contract['status'] !== 'ACCEPTED' || (int)$contract['accepted_by_id'] !== $executor_id) {
+                throw new Exception("Non puoi consegnare questo oggetto. Il contratto non è stato accettato o non sei l'esecutore.");
+            }
+
+            // 2. Verifica che gli oggetti siano disponibili nell'inventario dell'esecutore
+            foreach ($items_to_deliver as $item_data) {
+                if (!$this->itemModel->checkItemQuantity($executor_id, $item_data['item_id'], $item_data['quantity'])) {
+                    throw new Exception("Non hai abbastanza oggetti nell'inventario per consegnare.");
+                }
+            }
+
+            // 3. Sposta gli oggetti dall'esecutore al proponente (transazione di consegna)
+            $proposer_id = (int)$contract['proposer_id'];
+
+            foreach ($items_to_deliver as $item) {
+                // Sottrae dall'esecutore
+                $this->itemModel->updateInventory($executor_id, $item['item_id'], -$item['quantity']);
+                // Aggiunge al proponente
+                $this->itemModel->updateInventory($proposer_id, $item['item_id'], $item['quantity']);
+            }
+
+            // 4. Aggiorna lo stato del contratto a COMPLETED
+            $this->contractModel->updateContract($contract_id, [
+                'status' => 'COMPLETED',
+                'completed_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $this->contractModel->commit();
+            $this->successResponse("Oggetti consegnati con successo. Contratto completato.");
+        } catch (Exception $e) {
+            $this->contractModel->rollback();
+            error_log("Delivery Error: " . $e->getMessage());
+            $this->errorResponse("Errore durante la consegna: " . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Complete a service contract (mark as COMPLETED without item delivery)
+     */
+    public function completeContract($contract_id) {
+        $data = $this->getJsonInput();
+        $this->validateRequired($data, ['executor_id']);
+
+        $executor_id = (int)($data['executor_id'] ?? 0);
+        $contract_id = (int)($contract_id ?? 0);
+
+        if (!$executor_id || !$contract_id) {
+            $this->errorResponse("Executor ID and Contract ID are required.");
+        }
+
+        try {
+            $this->contractModel->beginTransaction();
+
+            // 1. Verifica che il contratto sia ACCEPTED e l'utente sia l'esecutore
+            $contract = $this->contractModel->findById($contract_id);
+            if (!$contract || $contract['status'] !== 'ACCEPTED' || (int)$contract['accepted_by_id'] !== $executor_id) {
+                throw new Exception("Non puoi completare questo contratto. Il contratto non è stato accettato o non sei l'esecutore.");
+            }
+
+            // 2. Aggiorna lo stato del contratto a COMPLETED
+            $this->contractModel->updateContract($contract_id, [
+                'status' => 'COMPLETED',
+                'completed_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $this->contractModel->commit();
+            $this->successResponse("Servizio completato con successo. Contratto completato.");
+        } catch (Exception $e) {
+            $this->contractModel->rollback();
+            error_log("Complete Contract Error: " . $e->getMessage());
+            $this->errorResponse("Errore durante il completamento: " . $e->getMessage(), 500);
         }
     }
 }
