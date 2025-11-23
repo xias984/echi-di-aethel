@@ -45,19 +45,26 @@ class Contract extends BaseModel {
     
     /**
      * Get contracts available for a user
+     * Returns both open contracts (filtered by user skills) and accepted contracts (where user is involved)
      */
     public function getAvailableContracts($user_id) {
+        $results = [];
+        
         // Get user skills and levels
         $user_skills = $this->getUserSkills($user_id);
         
-        $query = "
+        // Query for OPEN contracts (filtered by user skills)
+        $query_open = "
             SELECT 
                 c.contract_id, c.title, c.reward_amount, c.required_level, c.proposer_id, c.status,
+                c.accepted_by_id, c.created_at,
                 s.name AS required_skill_name,
-                u_prop.username AS proposer_name
+                u_prop.username AS proposer_name,
+                u_accept.username AS acceptor_name
             FROM contracts c
             JOIN skills s ON c.required_skill_id = s.skill_id
             JOIN users u_prop ON c.proposer_id = u_prop.user_id
+            LEFT JOIN users u_accept ON c.accepted_by_id = u_accept.user_id
             WHERE c.status = 'OPEN' 
         ";
         
@@ -74,17 +81,70 @@ class Contract extends BaseModel {
         }
         
         if (!empty($where_parts)) {
-            $query .= " AND (" . implode(" OR ", $where_parts) . ")";
+            $query_open .= " AND (" . implode(" OR ", $where_parts) . ")";
         } else {
             // If no skills, show only level 1 contracts
-            $query .= " AND c.required_level = 1";
+            $query_open .= " AND c.required_level = 1";
         }
         
-        $query .= " ORDER BY c.required_level ASC, c.created_at DESC";
+        $query_open .= " ORDER BY c.required_level ASC, c.created_at DESC";
         
-        $stmt = $this->pdo->prepare($query);
-        $stmt->execute($params);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Execute first query for OPEN contracts
+        if (!empty($params)) {
+            $stmt = $this->pdo->prepare($query_open);
+            $stmt->execute($params);
+        } else {
+            $stmt = $this->pdo->prepare($query_open);
+            $stmt->execute();
+        }
+        $open_contracts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $results = array_merge($results, $open_contracts);
+        
+        // Query for ACCEPTED/COMPLETED contracts where user is involved
+        if ($user_id > 0) {
+            $query_accepted = "
+                SELECT 
+                    c.contract_id, c.title, c.reward_amount, c.required_level, c.proposer_id, c.status,
+                    c.accepted_by_id, c.created_at,
+                    s.name AS required_skill_name,
+                    u_prop.username AS proposer_name,
+                    u_accept.username AS acceptor_name
+                FROM contracts c
+                JOIN skills s ON c.required_skill_id = s.skill_id
+                JOIN users u_prop ON c.proposer_id = u_prop.user_id
+                LEFT JOIN users u_accept ON c.accepted_by_id = u_accept.user_id
+                WHERE (c.status = 'ACCEPTED' OR c.status = 'COMPLETED')
+                AND (c.proposer_id = ? OR c.accepted_by_id = ?)
+                ORDER BY c.status ASC, c.required_level ASC, c.created_at DESC
+            ";
+            
+            $stmt = $this->pdo->prepare($query_accepted);
+            $stmt->execute([$user_id, $user_id]);
+            $accepted_contracts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $results = array_merge($results, $accepted_contracts);
+        }
+        
+        // Sort results: OPEN first, then ACCEPTED/COMPLETED
+        usort($results, function($a, $b) {
+            // First sort by status (OPEN < ACCEPTED < COMPLETED)
+            $status_order = ['OPEN' => 1, 'ACCEPTED' => 2, 'COMPLETED' => 3];
+            $a_status = $status_order[$a['status']] ?? 99;
+            $b_status = $status_order[$b['status']] ?? 99;
+            
+            if ($a_status !== $b_status) {
+                return $a_status - $b_status;
+            }
+            
+            // Then by required_level
+            if ($a['required_level'] !== $b['required_level']) {
+                return $a['required_level'] - $b['required_level'];
+            }
+            
+            // Finally by created_at (newest first)
+            return strtotime($b['created_at'] ?? 0) - strtotime($a['created_at'] ?? 0);
+        });
+        
+        return $results;
     }
     
     /**

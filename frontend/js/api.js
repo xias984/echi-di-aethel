@@ -86,6 +86,14 @@ class ApiManager {
         });
     }
 
+    getContractMessages(contractId, userId) {
+        return this.call(`/chat/${contractId}/messages`, 'POST', { user_id: userId });
+    }
+
+    sendMessage(contractId, userId, message) {
+        return this.call(`/chat/${contractId}`, 'POST', { user_id: userId, message: message });
+    }
+
     // Admin methods
     getAdminUsers(adminId) {
         return this.call('/admin/users', 'POST', { admin_id: adminId });
