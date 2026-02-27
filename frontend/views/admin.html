@@ -1,0 +1,52 @@
+<!-- Admin Page Content -->
+<div id="admin-page-content">
+    <div class="flex justify-between items-center mb-4 border-b-2 border-[#A67B5B] pb-3">
+        <h2 class="text-3xl font-bold text-[#6F4E37]" style="font-family: 'Cinzel', serif;">⚙️ Gestione Admin</h2>
+    </div>
+    <p id="admin-message" class="hidden mt-3 p-2 rounded"></p>
+
+    <div class="flex flex-wrap gap-2 mb-6">
+        <button id="admin-refresh-btn"
+            class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors font-semibold">
+            Aggiorna Dati
+        </button>
+        <button id="admin-toggle-users-btn"
+            class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors font-semibold">
+            Mostra/Nascondi Utenti
+        </button>
+        <button id="admin-toggle-contracts-btn"
+            class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors font-semibold">
+            Mostra/Nascondi Contratti
+        </button>
+        <button id="admin-toggle-skills-btn"
+            class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors font-semibold">
+            Mostra/Nascondi Abilità
+        </button>
+    </div>
+
+    <div id="admin-users-section" class="hidden mb-6">
+        <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Gestione Utenti</h3>
+        <div id="admin-users-loading" class="hidden p-5 text-center">
+            <p class="bg-[#EAE0D5] text-[#6F4E37] p-3 rounded-md border border-[#A67B5B]">Caricamento utenti...</p>
+        </div>
+        <div id="admin-users-content"></div>
+    </div>
+
+    <div id="admin-contracts-section" class="hidden">
+        <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Gestione Contratti
+        </h3>
+        <div id="admin-contracts-loading" class="hidden p-5 text-center">
+            <p class="bg-[#EAE0D5] text-[#6F4E37] p-3 rounded-md border border-[#A67B5B]">Caricamento contratti...</p>
+        </div>
+        <div id="admin-contracts-content"></div>
+    </div>
+
+    <div id="admin-skills-section" class="hidden">
+        <h3 class="text-xl font-semibold text-[#402E32] mb-4" style="font-family: 'Cinzel', serif;">Gestione Abilità
+        </h3>
+        <div id="admin-skills-loading" class="hidden p-5 text-center">
+            <p class="bg-[#EAE0D5] text-[#6F4E37] p-3 rounded-md border border-[#A67B5B]">Caricamento abilità...</p>
+        </div>
+        <div id="admin-skills-content"></div>
+    </div>
+</div>

@@ -13,7 +13,7 @@ class ProfilePage {
     }
 
     setupEventListeners() {
-        $('#refresh-btn').on('click', () => this.loadProfile());
+        $(document).on('click', '#refresh-btn', () => this.loadProfile());
         $(document).on('click', '[data-skill-name]', (e) => {
             if ($(e.currentTarget).data('skill-name')) {
                 this.handleUseSkill(e);
@@ -23,8 +23,8 @@ class ProfilePage {
             this.handleEquipItem(e);
         });
 
-        $('#character-tabs .tab-button').on('click', (e) => this.handleTabNavigation(e));
-        $('#nav-profile-btn').on('click', () => this.router.navigateTo('profile'));
+        $(document).on('click', '#character-tabs .tab-button', (e) => this.handleTabNavigation(e));
+        $(document).on('click', '#nav-profile-btn', () => this.router.navigateTo('profile'));
     }
 
     handleTabNavigation(event) {
@@ -75,7 +75,7 @@ class ProfilePage {
     async handleUseSkill(event) {
         const userId = this.state.getUserId();
         if (!userId) return;
-        
+
         const skillName = $(event.currentTarget).data('skill-name');
         this.messages.setMessage('action-message', `Esecuzione di ${skillName}...`, 'loading');
 
@@ -92,7 +92,7 @@ class ProfilePage {
     async handleEquipItem(event) {
         const userId = this.state.getUserId();
         if (!userId) return;
-        
+
         const itemId = $(event.currentTarget).data('item-id');
         this.messages.setMessage('action-message', 'Equipaggiamento in corso...', 'loading');
 
@@ -111,14 +111,10 @@ class ProfilePage {
             this.router.navigateTo('auth');
             return;
         }
-        
-        $('#admin-page-content').addClass('hidden');
-        $('#contract-board').addClass('hidden');
-        $('#welcome-message').addClass('hidden');
+
         $('#sidebar').removeClass('hidden');
-        $('#character-page-content').removeClass('hidden');
         $('#character-tabs .tab-button').first().trigger('click');
-        
+
         this.loadProfile();
     }
 }

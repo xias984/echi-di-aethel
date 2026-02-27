@@ -32,6 +32,12 @@ class Router {
         $this->routes['POST']['/api/contracts/{id}/accept'] = ['ContractController', 'acceptContract'];
         $this->routes['POST']['/api/contracts/{id}/deliver'] = ['ContractController', 'deliverContract'];
         $this->routes['POST']['/api/contracts/{id}/complete'] = ['ContractController', 'completeContract'];
+
+        // Skill routes (Admin only)
+        $this->routes['POST']['/api/admin/skills'] = ['SkillController', 'createSkill'];
+        $this->routes['GET']['/api/admin/skills'] = ['SkillController', 'getAllSkills'];
+        $this->routes['PUT']['/api/admin/skills/{id}'] = ['SkillController', 'updateSkill'];
+        $this->routes['DELETE']['/api/admin/skills/{id}'] = ['SkillController', 'deleteSkill'];
         
         // Chat routes
         $this->routes['POST']['/api/chat/{id}'] = ['ChatController', 'sendMessage'];

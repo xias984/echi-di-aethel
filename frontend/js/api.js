@@ -133,4 +133,23 @@ class ApiManager {
     deleteContract(adminId, contractId) {
         return this.call(`/admin/contracts/${contractId}`, 'DELETE', { admin_id: adminId });
     }
+
+    // Admin Skill methods
+    getAdminSkills() {
+        return this.call('/admin/skills', 'GET');
+    }
+
+    createSkill(adminId, data) {
+        const payload = { admin_id: adminId, ...data };
+        return this.call('/admin/skills', 'POST', payload);
+    }
+
+    updateSkill(adminId, skillId, data) {
+        const payload = { admin_id: adminId, ...data };
+        return this.call(`/admin/skills/${skillId}`, 'PUT', payload);
+    }
+
+    deleteSkill(adminId, skillId) {
+        return this.call(`/admin/skills/${skillId}`, 'DELETE', { admin_id: adminId });
+    }
 }

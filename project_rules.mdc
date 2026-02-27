@@ -1,0 +1,25 @@
+---
+description: Regole e contesto del progetto Echi di Aethel
+---
+# Echi di Aethel - Project Rules & Context
+
+Questo file contiene le linee guida e il contesto per lo sviluppo del progetto "Echi di Aethel".
+
+## Project Overview
+"Echi di Aethel" è un progetto di gioco di ruolo (RPG) o applicazione narrativa con una forte componente di economia di gioco, meccaniche di progressione e un'estetica ispirata a manoscritti antichi e rovine (Aethel Ruins).
+
+## Tech Stack
+- **Frontend**: HTML5, Tailwind CSS, Chart.js (per le curve di XP), Google Fonts (Cinzel, Inter).
+- **Backend**: PHP (7.4+ o 8.x), PostgreSQL.
+- **Infrastruttura**: Docker Compose (servizi: `php`, `db`, `nginx`, `pgadmin`).
+- **Internazionalizzazione (i18n)**: Gestita tramite file JS dedicati e selettore di lingua nel frontend.
+
+## Codestyle & Architecture
+- **Frontend**: Utilizzo di Tailwind per lo styling. JS organizzato in `frontend/js/white-paper/` (config, translations, main).
+- **Backend**: Struttura MVC-like con `api/`, `config/`, `controllers/`, `models/`.
+- **Database**: PostgreSQL con migrazioni gestite tramite script SQL nella cartella `migrations/`.
+
+## Istruzioni per l'IA (Antigravity)
+- **Stile**: Mantieni un tono professionale ma coinvolgente, in linea con l'ambientazione "Aethel".
+- **Design**: Priorità a UI premium, glassmorphism leggero, micro-animazioni e palette colori calde/terrose (#FDFBF8, #6F4E37, #A67B5B).
+- **Token Efficiency**: Evita di rileggere file interi se non necessario. Utilizza `list_dir` per mappare la struttura e `grep_search` per trovare specifiche funzioni.

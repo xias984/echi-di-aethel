@@ -13,17 +13,17 @@ class ContractsPage {
     }
 
     setupEventListeners() {
-        $('#toggle-create-form-btn').on('click', () => $('#contract-create').toggleClass('hidden'));
-        $('#create-contract-btn').on('click', () => this.handleCreateContract());
+        $(document).on('click', '#toggle-create-form-btn', () => $('#contract-create').toggleClass('hidden'));
+        $(document).on('click', '#create-contract-btn', () => this.handleCreateContract());
         $(document).on('click', '.accept-contract-btn', (e) => this.handleAcceptContract(e));
         $(document).on('click', '.deliver-contract-btn', (e) => this.handleDeliverContract(e));
         $(document).on('click', '.complete-contract-btn', (e) => this.handleCompleteContract(e));
 
         // Nuovi listeners per la Chat
         $(document).on('click', '.open-chat-btn', (e) => this.handleOpenChat(e));
-        $('#close-chat-modal').on('click', () => this.handleCloseChat());
-        $('#send-message-btn').on('click', () => this.handleSendMessage());
-        $('#chat-input').on('keypress', (e) => { if (e.which === 13) this.handleSendMessage(); });
+        $(document).on('click', '#close-chat-modal', () => this.handleCloseChat());
+        $(document).on('click', '#send-message-btn', () => this.handleSendMessage());
+        $(document).on('keypress', '#chat-input', (e) => { if (e.which === 13) this.handleSendMessage(); });
     }
 
     async loadContracts() {
@@ -86,7 +86,7 @@ class ContractsPage {
             this.contractsRenderer.renderChatMessages(response.messages, this.state.getUserId());
         } catch (error) {
             // Non usare il modale generico per errori di polling, usa la console.
-            console.error("Errore nel caricamento dei messaggi:", error.message); 
+            console.error("Errore nel caricamento dei messaggi:", error.message);
         }
     }
 
@@ -211,9 +211,6 @@ class ContractsPage {
         const userId = this.state.getUserId();
         if (!userId) return;
 
-        $('#admin-page-content').addClass('hidden');
-        $('#character-page-content').addClass('hidden');
-        $('#contract-board').removeClass('hidden');
         $('#chat-modal').addClass('hidden');
 
         this.loadContracts();

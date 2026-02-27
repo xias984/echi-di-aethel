@@ -29,11 +29,7 @@ class AuthPage {
             $('#login-form').addClass('hidden');
             $('#creation-form').removeClass('hidden');
         }
-        $('#admin-page-content').addClass('hidden');
         $('#sidebar').addClass('hidden');
-        $('#contract-board').addClass('hidden');
-        $('#character-page-content').addClass('hidden');
-        $('#welcome-message').removeClass('hidden');
         $('#user-menu').addClass('hidden');
     }
 
@@ -42,8 +38,6 @@ class AuthPage {
         $('#creation-form').addClass('hidden');
         $('#user-menu').removeClass('hidden');
         $('#sidebar').removeClass('hidden');
-        $('#contract-board').removeClass('hidden');
-        $('#welcome-message').addClass('hidden');
     }
 
     async handleLogin() {

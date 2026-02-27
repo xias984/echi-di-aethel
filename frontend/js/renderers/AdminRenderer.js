@@ -121,6 +121,113 @@ class AdminRenderer {
         $('#admin-contracts-content').html(html);
     }
 
+    renderAdminSkills(skillsHierarchy, availableParents) {
+        if (!skillsHierarchy || skillsHierarchy.length === 0) {
+            $('#admin-skills-content').html('<p class="text-[#6F4E37] py-4">Nessuna skill trovata.</p>');
+            return;
+        }
+
+        let html = '<div class="overflow-x-auto"><table class="w-full border-collapse text-sm"><thead><tr class="bg-[#EAE0D5]">';
+        html += '<th class="p-2 text-left border-2 border-[#A67B5B] font-semibold text-[#402E32]">ID</th>';
+        html += '<th class="p-2 text-left border-2 border-[#A67B5B] font-semibold text-[#402E32]">Nome / Classe Base</th>';
+        html += '<th class="p-2 text-left border-2 border-[#A67B5B] font-semibold text-[#402E32]">Descrizione</th>';
+        html += '<th class="p-2 text-left border-2 border-[#A67B5B] font-semibold text-[#402E32]">Max Livello</th>';
+        html += '<th class="p-2 text-left border-2 border-[#A67B5B] font-semibold text-[#402E32]">Azioni</th>';
+        html += '</tr></thead><tbody>';
+
+        skillsHierarchy.forEach(parent => {
+            // Riga genitore (classe base)
+            const parentId = parent.skill_id;
+            html += `<tr class="bg-[#F5ECE2] cursor-pointer toggle-skill-parent font-bold" data-skill-id="${parentId}">`;
+            html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32]">${parentId}</td>`;
+            html += `<td class="p-2 border-2 border-[#A67B5B] text-[#6F4E37]"><span class="caret-icon inline-block mr-2">▶</span>${parent.name} (${parent.base_class})</td>`;
+            html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32]">${parent.description ? (parent.description.length > 50 ? parent.description.substring(0, 50) + '...' : parent.description) : 'Nessuna descrizione'}</td>`;
+            html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32]">${parent.max_level}</td>`;
+            html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32]">
+                <button class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-2 py-1 rounded text-xs mr-1 edit-skill-btn font-semibold" data-skill-id="${parentId}" data-is-parent="true">Modifica</button>
+                <button class="bg-[#8C5A3C] hover:bg-[#6F4228] text-white px-2 py-1 rounded text-xs delete-skill-btn font-semibold" data-skill-id="${parentId}">Elimina</button>
+                </td>`;
+            html += '</tr>';
+
+            // Righe Figlie (inizialmente nascoste)
+            html += `<tr class="skill-children-row hidden" data-parent-id="${parentId}"><td colspan="5" class="p-0">`;
+            html += `<table class="w-full"><tbody>`;
+
+            parent.children.forEach(child => {
+                const childId = child.skill_id;
+                // Stimiamo il livello di sblocco in base alla posizione (solo per visualizzazione)
+                const unlockLevel = (parentId === 3 || parentId === 4) ? (childId === 6 || childId === 7 ? 10 : 25) : 0;
+                const unlockText = unlockLevel > 0 ? ` (Sblocco Liv. ${unlockLevel})` : '';
+                
+                html += `<tr class="bg-[#FDFBF8] even:bg-gray-50 skill-row" data-skill-id="${childId}">`;
+                html += `<td class="p-2 pl-8 border-2 border-[#A67B5B] text-[#402E32] w-12">${childId}</td>`;
+                html += `<td class="p-2 border-2 border-[#A67B5B] text-[#6F4E37] flex-1">└─ ${child.name} ${unlockText}</td>`;
+                html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32] w-64">${child.description ? (child.description.length > 50 ? child.description.substring(0, 50) + '...' : child.description) : 'Nessuna descrizione'}</td>`;
+                html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32] w-20">${child.max_level}</td>`;
+                html += `<td class="p-2 border-2 border-[#A67B5B] text-[#402E32] w-36">
+                    <button class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-2 py-1 rounded text-xs mr-1 edit-skill-btn font-semibold" data-skill-id="${childId}" data-is-parent="false">Modifica</button>
+                    <button class="bg-[#8C5A3C] hover:bg-[#6F4228] text-white px-2 py-1 rounded text-xs delete-skill-btn font-semibold" data-skill-id="${childId}">Elimina</button>
+                    </td>`;
+                html += '</tr>'
+            });
+
+            html += `</tbody></table></td></tr>`;
+
+            // Edit form (initially hidden) for Parent and Children
+            html += this.renderSkillEditRow(parent, availableParents);
+            parent.children.forEach(child => {
+                html += this.renderSkillEditRow(child, availableParents);
+            });
+        });
+
+        html += '</tbody></table></div>';
+        $('#admin-skills-content').html(html);
+    }
+
+    renderSkillEditRow(skill, availableParents) {
+        const isParent = skill.parent_skill_id === null;
+        let parentOptions = '<option value"">(Nessun Genitore / Classe Base)</option>';
+
+        // Filtra se stesso per evitare loop e assicurare che solo le classi base possono essere genitore
+        availableParents.filter(p => p.skill_id !== skill.skill_id && p.parent_skill_id === null).forEach(p => {
+            const selected = p.skill_id === skill.parent_skill_id ? 'selected' : '';
+            parentOptions += `<option value="${p.skill_id}" ${selected}>${p.name}</option>`;
+        });
+
+        return `<tr class="edit-skill-row hidden" data-skill-id="${skill.skill_id}">
+            <td colspan="5" class="p-3 border-2 border-[#A67B5B] bg-[#EAE0D5] text-[#402E32]">
+                <div class="flex flex-col gap-2">
+                    <input type="text" class="px-3 py-1 border border-[#A67B5B] rounded edit-skill-name bg-[#FDFBF8] text-[#402E32]" value="${skill.name}" placeholder="Nome">
+                    <input type="text" class="px-3 py-1 border border-[#A67B5B] rounded edit-skill-desc bg-[#FDFBF8] text-[#402E32]" value="${skill.description}" placeholder="Descrizione">
+                    <div class="flex gap-2 items-center">
+                        <input type="text" class="px-3 py-1 border border-[#A67B5B] rounded edit-skill-base-class bg-[#FDFBF8] text-[#402E32]" value="${skill.base_class}" placeholder="Classe Base">
+                        <input type="number" class="px-3 py-1 border border-[#A67B5B] rounded w-24 edit-skill-max-level bg-[#FDFBF8] text-[#402E32]" value="${skill.max_level}" placeholder="Max Livello">
+                        <select class="px-3 py-1 border border-[#A67B5B] rounded edit-skill-parent bg-[#FDFBF8] text-[#402E32]" ${isParent ? 'disabled' : ''}>
+                            ${parentOptions}
+                        </select>
+                        <button class="bg-[#A67B5B] hover:bg-[#8C6239] text-white px-3 py-1 rounded save-skill-btn font-semibold" data-skill-id="${skill.skill_id}">Salva</button>
+                        <button class="bg-[#8C6239] hover:bg-[#6F4E37] text-white px-3 py-1 rounded cancel-edit-btn font-semibold" data-skill-id="${skill.skill_id}">Annulla</button>
+                    </div>
+                </div>
+            </td>
+        </tr>`;
+    }
+
+    showAdminSkillsLoading() {
+        $('#admin-skills-loading').removeClass('hidden');
+        $('#admin-skills-content').addClass('hidden');
+    }
+
+    hideAdminSkillsLoading() {
+        $('#admin-skills-loading').addClass('hidden');
+        $('#admin-skills-content').removeClass('hidden');
+    }
+
+    // Ritorna gli ID dei genitori per l'uso nel controller
+    getParents(skillsHierarchy) {
+        return skillsHierarchy.filter(s => s.parent_skill_id === null);
+    }
+
     showAdminUsersLoading() {
         $('#admin-users-loading').removeClass('hidden');
         $('#admin-users-content').addClass('hidden');
