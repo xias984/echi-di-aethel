@@ -1,25 +1,50 @@
 ---
-description: Regole e contesto del progetto Echi di Aethel
+description: Regole, meccaniche d20 e logica di integrazione IA per Echi di Aethel
 ---
-# Echi di Aethel - Project Rules & Context
-
-Questo file contiene le linee guida e il contesto per lo sviluppo del progetto "Echi di Aethel".
+# Echi di Aethel - Project Rules & Context (Updated v2.0)
 
 ## Project Overview
-"Echi di Aethel" è un progetto di gioco di ruolo (RPG) o applicazione narrativa con una forte componente di economia di gioco, meccaniche di progressione e un'estetica ispirata a manoscritti antichi e rovine (Aethel Ruins).
+"Echi di Aethel" è un ecosistema evolutivo di simulazione e RPG. Il mondo parte in uno stato "vergine" (zero conoscenze): i giocatori devono scoprire risorse, leggi fisiche e tecnologie tramite esperimenti validati da un'IA, registrando brevetti (Blueprints) in un'economia competitiva.
 
 ## Tech Stack
-- **Frontend**: HTML5, Tailwind CSS, Chart.js (per le curve di XP), Google Fonts (Cinzel, Inter).
-- **Backend**: PHP (7.4+ o 8.x), PostgreSQL.
-- **Infrastruttura**: Docker Compose (servizi: `php`, `db`, `nginx`, `pgadmin`).
-- **Internazionalizzazione (i18n)**: Gestita tramite file JS dedicati e selettore di lingua nel frontend.
+- **Frontend**: HTML5, Tailwind CSS, Chart.js, Google Fonts (Cinzel, Inter, Orbitron/Share Tech Mono per interfacce lab).
+- **Backend**: PHP (8.x), PostgreSQL.
+- **Infrastruttura**: Docker Compose (`php`, `db`, `nginx`, `pgadmin`).
+- **IA Engine**: Integrazione tramite API (Gemini/Claude) per la validazione scientifica degli asset.
 
-## Codestyle & Architecture
-- **Frontend**: Utilizzo di Tailwind per lo styling. JS organizzato in `frontend/js/white-paper/` (config, translations, main).
-- **Backend**: Struttura MVC-like con `api/`, `config/`, `controllers/`, `models/`.
-- **Database**: PostgreSQL con migrazioni gestite tramite script SQL nella cartella `migrations/`.
+## Core Mechanics (New)
+### 1. Sistema d20 & Character Sheet
+- Tutte le azioni utilizzano la formula: `1d20 + Modificatore Caratteristica + Bonus Competenza`.
+- **Caratteristiche**: Forza, Destrezza, Costituzione, Intelligenza, Saggezza, Carisma.
+- **Sopravvivenza**: Gestione tick-based (15 min) di Fame, Sete e Stamina.
+- **Logout-Freeze**: Al logout, lo stato del player viene congelato; al rientro, il tempo offline viene convertito in recupero stamina (asincrono).
+
+
+
+### 2. Motore di Sintesi & Blueprints
+- **Validazione IA**: L'IA agisce come "Giudice di Brevetti", analizzando Tag, Dosaggi e Parametri (Temp/Press) per generare nuovi asset.
+- **Blueprint Ownership**: Il primo giocatore che scopre o "migliora" (rank superiore) una ricetta ne ottiene la proprietà intellettuale.
+- **R&D Competitivo**: Se un giocatore ottiene un Rank (S, A, B, C, D) superiore a una ricetta esistente nel DB, ne scala la proprietà e le royalties associate.
+
+### 3. Economia Circolare
+- **Valute**: COIN (Valuta Premium/Scambio) e Punti Ricerca (PR - Valuta di gioco per R&D).
+- **Royalties**: I proprietari di Blueprint certificati guadagnano una % di PR ogni volta che altri giocatori utilizzano la loro ricetta.
+- **Saturazione**: Le royalties calano nel tempo (conoscenza comune) e richiedono costi di manutenzione in COIN.
+
+
+
+## Database Schema Updates (Migrations)
+- **`players`**: Aggiunta campi d20 (stats) e barre biologiche.
+- **`assets`**: Implementazione di array JSONB per i `tags` (per compatibilità con IA).
+- **`blueprints`**: Campi per `owner_id`, `rank`, `hash_recipe` (MD5 dei componenti) e `royalty_rate`.
 
 ## Istruzioni per l'IA (Antigravity)
-- **Stile**: Mantieni un tono professionale ma coinvolgente, in linea con l'ambientazione "Aethel".
-- **Design**: Priorità a UI premium, glassmorphism leggero, micro-animazioni e palette colori calde/terrose (#FDFBF8, #6F4E37, #A67B5B).
-- **Token Efficiency**: Evita di rileggere file interi se non necessario. Utilizza `list_dir` per mappare la struttura e `grep_search` per trovare specifiche funzioni.
+- **Logica d20**: Quando generi codice per le interazioni, applica sempre il middleware di calcolo dei modificatori basato sul punteggio caratteristica `(Stat - 10) / 2`.
+- **Invenzione Asset**: Se l'utente propone una nuova combinazione, usa il `system_prompt` dedicato per mappare gli input su 10 costanti universali di gioco (Vigor, Potency, Integrity, etc.).
+- **Design**: Mantieni il "Nexus Lab Style" per le aree tecniche: font mono-spaziati, griglie radar per le stats e feedback immediato dai tiri di dado.
+
+
+
+## Token Efficiency
+- Utilizza `grep_search` per mappare le tabelle di PostgreSQL prima di generare nuove migrazioni.
+- Evita query ridondanti sulla tabella `blueprints` utilizzando il sistema di cache hash_recipe per validare combinazioni già esistenti.
