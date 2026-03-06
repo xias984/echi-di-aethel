@@ -21,12 +21,14 @@ class App {
             this.profilePage = new ProfilePage(this.api, this.state, this.messages, profileRenderer, equipmentRenderer, this.router);
             this.contractsPage = new ContractsPage(this.api, this.state, this.messages, contractsRenderer);
             this.adminPage = new AdminPage(this.api, this.state, this.messages, adminRenderer);
+            this.mapPage = new MapPage(this.router);
 
             // Registra le pagine nel router
             this.router.registerPage('auth', this.authPage);
             this.router.registerPage('profile', this.profilePage);
             this.router.registerPage('contracts', this.contractsPage);
             this.router.registerPage('admin', this.adminPage);
+            this.router.registerPage('map', this.mapPage);
 
             $('#admin-panel-btn').on('click', () => {
                 this.router.navigateTo('admin');
@@ -70,12 +72,12 @@ $(document).ready(() => {
 
     try {
         // Verifica che tutte le dipendenze siano caricate
-        if (typeof StateManager === 'undefined' || typeof Router === 'undefined' || 
+        if (typeof StateManager === 'undefined' || typeof Router === 'undefined' ||
             typeof ApiManager === 'undefined' || typeof MessageRenderer === 'undefined') {
             alert('Errore: alcune dipendenze non sono state caricate. Verifica l\'ordine degli script in index.html');
             return;
         }
-        
+
         const app = new App();
 
         app.state.clearUser();
@@ -85,6 +87,9 @@ $(document).ready(() => {
         });
         $('#nav-profile-btn').on('click', () => {
             app.router.navigateTo('profile');
+        });
+        $('#nav-map-btn').on('click', () => {
+            app.router.navigateTo('map');
         });
     } catch (error) {
         alert('Errore durante il caricamento dell\'applicazione. Ricarica la pagina.');

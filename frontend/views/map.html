@@ -1,0 +1,69 @@
+<div class="h-full w-full flex flex-col relative">
+    <div class="flex justify-between items-center mb-6 z-10">
+        <div>
+            <h2 class="text-3xl font-bold text-[#402E32]" style="font-family: 'Cinzel', serif;">Terre di Aethel</h2>
+            <p class="text-sm text-[#6F4E37] mt-1">Seleziona un'area della griglia per esplorarla.</p>
+        </div>
+        <div id="map-legend"
+            class="flex gap-4 items-center text-sm text-[#402E32] bg-[#FDFBF8] px-4 py-2 rounded-lg border border-[#A67B5B] shadow-sm">
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-[#84CC6D] rounded-full"></div> Pianura
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-[#2D662E] rounded-full"></div> Foresta
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-[#888C8D] rounded-full"></div> Montagna
+            </div>
+            <div class="flex items-center gap-1">
+                <div class="w-3 h-3 bg-[#4DA6FF] rounded-full"></div> Acqua
+            </div>
+        </div>
+    </div>
+
+    <!-- 2D Map Container -->
+    <div id="map-2d-container"
+        class="flex-1 overflow-auto bg-[#FDFBF8] rounded-lg border-2 border-[#A67B5B] shadow-inner p-4 flex justify-center items-center transition-opacity duration-300">
+        <div id="map-grid"
+            class="grid grid-cols-10 gap-1 w-full max-w-[600px] aspect-square mx-auto bg-[#6F4E37] p-2 rounded-md shadow-lg">
+            <!-- Tiles will be appended here by MapPage.js -->
+        </div>
+    </div>
+
+    <!-- 3D View Container (Initially Hidden) -->
+    <div id="map-3d-container"
+        class="hidden absolute inset-0 z-40 bg-black flex flex-col rounded-lg overflow-hidden border-2 border-[#A67B5B] shadow-2xl">
+        <!-- Overlay UI (Blocker) -->
+        <div id="blocker"
+            class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-70 text-white backdrop-blur-sm cursor-pointer transition-opacity">
+            <h1 class="text-5xl mb-6 font-bold text-[#FDFBF8]" style="font-family: 'Cinzel', serif;">Esplorazione</h1>
+            <p class="mb-4 text-2xl text-[#EAE0D5]">Clicca lo schermo per iniziare</p>
+            <div class="text-center text-sm mb-8 text-[#D3C5B6] bg-[#402E32] p-4 rounded-lg border border-[#A67B5B]">
+                <p class="mb-2 uppercase font-bold tracking-wider border-b border-[#6F4E37] pb-2">Controlli</p>
+                <div class="grid grid-cols-2 gap-x-8 gap-y-2 text-left mt-3">
+                    <span><kbd class="bg-[#2a1e21] px-1 py-0.5 rounded">W</kbd> <kbd
+                            class="bg-[#2a1e21] px-1 py-0.5 rounded">A</kbd> <kbd
+                            class="bg-[#2a1e21] px-1 py-0.5 rounded">S</kbd> <kbd
+                            class="bg-[#2a1e21] px-1 py-0.5 rounded">D</kbd></span> <span>Movimento</span>
+                    <span><kbd class="bg-[#2a1e21] px-1 py-0.5 rounded">MOUSE</kbd></span> <span>Visuale</span>
+                    <span><kbd class="bg-[#2a1e21] px-1 py-0.5 rounded">SPAZIO</kbd></span> <span>Salta</span>
+                    <span><kbd class="bg-[#2a1e21] px-1 py-0.5 rounded">ESC</kbd></span> <span>Pausa / Menu</span>
+                </div>
+            </div>
+            <button id="exit-3d-btn"
+                class="bg-[#A67B5B] hover:bg-[#8C6239] text-[#FDFBF8] px-8 py-3 rounded-md font-bold transition-colors shadow-lg border border-[#FDFBF8]">
+                Esci dall'Esplorazione
+            </button>
+        </div>
+
+        <!-- Canvas wrapper -->
+        <div id="3d-canvas-container" class="flex-1 w-full h-full relative cursor-none">
+            <!-- Three.js Canvas will go here -->
+            <div id="crosshair"
+                class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white pointer-events-none z-40 flex items-center justify-center opacity-70">
+                <div class="w-full h-[2px] bg-white absolute"></div>
+                <div class="h-full w-[2px] bg-white absolute"></div>
+            </div>
+        </div>
+    </div>
+</div>

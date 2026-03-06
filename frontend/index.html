@@ -141,8 +141,13 @@
                     </button>
 
                     <button id="nav-contracts-btn"
-                        class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-6 font-semibold">
+                        class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-4 font-semibold">
                         Bacheca Contratti
+                    </button>
+
+                    <button id="nav-map-btn"
+                        class="w-full bg-[#A67B5B] hover:bg-[#8C6239] text-white px-4 py-2 rounded-md transition-colors mb-6 font-semibold">
+                        Esplora Mappa
                     </button>
 
                     <button id="refresh-btn"
@@ -207,6 +212,11 @@
     <script src="js/core/StateManager.js"></script>
     <script src="js/core/Router.js"></script>
 
+    <!-- 3D & Math Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
     <!-- Renderers -->
     <script src="js/renderers/MessageRenderer.js"></script>
     <script src="js/renderers/ProfileRenderer.js"></script>
@@ -219,6 +229,15 @@
     <script src="js/pages/ProfilePage.js"></script>
     <script src="js/pages/ContractsPage.js"></script>
     <script src="js/pages/AdminPage.js"></script>
+
+    <!-- Game Engine Modules -->
+    <script src="js/game/WorldManager.js"></script>
+    <script src="js/game/TerrainGenerator.js"></script>
+    <script src="js/game/InteractionEngine.js"></script>
+    <script src="js/game/PhysicsEngine.js"></script>
+    <script src="js/game/GameEngine.js"></script>
+
+    <script src="js/pages/MapPage.js"></script>
 
     <!-- Main entry point -->
     <script src="js/main.js"></script>
