@@ -1,6 +1,19 @@
 <?php
 // Refactored API entry point using MVC pattern
 
+// Catch fatal errors and return JSON instead of HTML
+register_shutdown_function(function () {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        if (!headers_sent()) {
+            http_response_code(500);
+            header('Content-Type: application/json');
+        }
+        error_log("Fatal Error: {$error['message']} in {$error['file']}:{$error['line']}");
+        echo json_encode(['error' => 'Internal server error.']);
+    }
+});
+
 // Load autoloader and configuration first
 require_once '../config/autoloader.php';
 

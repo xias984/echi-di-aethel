@@ -15,18 +15,21 @@ class App {
             const equipmentRenderer = new EquipmentRenderer();
             const contractsRenderer = new ContractsRenderer();
             const adminRenderer = new AdminRenderer();
+            const labRenderer = new LabRenderer();
 
             // Inizializza le pagine
             this.authPage = new AuthPage(this.api, this.state, this.messages, this.router, adminRenderer);
             this.profilePage = new ProfilePage(this.api, this.state, this.messages, profileRenderer, equipmentRenderer, this.router);
             this.contractsPage = new ContractsPage(this.api, this.state, this.messages, contractsRenderer);
             this.adminPage = new AdminPage(this.api, this.state, this.messages, adminRenderer);
+            this.labPage = new LabPage(this.api, this.state, this.messages, labRenderer);
 
             // Registra le pagine nel router
             this.router.registerPage('auth', this.authPage);
             this.router.registerPage('profile', this.profilePage);
             this.router.registerPage('contracts', this.contractsPage);
             this.router.registerPage('admin', this.adminPage);
+            this.router.registerPage('lab', this.labPage);
 
             $('#admin-panel-btn').on('click', () => {
                 this.router.navigateTo('admin');
@@ -70,15 +73,13 @@ $(document).ready(() => {
 
     try {
         // Verifica che tutte le dipendenze siano caricate
-        if (typeof StateManager === 'undefined' || typeof Router === 'undefined' || 
+        if (typeof StateManager === 'undefined' || typeof Router === 'undefined' ||
             typeof ApiManager === 'undefined' || typeof MessageRenderer === 'undefined') {
-            alert('Errore: alcune dipendenze non sono state caricate. Verifica l\'ordine degli script in index.html');
+            $('#login-message').text('Errore: dipendenze non caricate. Ricarica la pagina.').removeClass('hidden').addClass('bg-red-100 text-red-800 p-2 rounded');
             return;
         }
-        
-        const app = new App();
 
-        app.state.clearUser();
+        const app = new App();
 
         $('#nav-contracts-btn').on('click', () => {
             app.router.navigateTo('contracts');
@@ -86,7 +87,11 @@ $(document).ready(() => {
         $('#nav-profile-btn').on('click', () => {
             app.router.navigateTo('profile');
         });
+        $('#nav-lab-btn').on('click', () => {
+            app.router.navigateTo('lab');
+        });
     } catch (error) {
-        alert('Errore durante il caricamento dell\'applicazione. Ricarica la pagina.');
+        console.error('Errore durante il caricamento:', error);
+        $('#login-message').text('Errore durante il caricamento. Ricarica la pagina.').removeClass('hidden').addClass('bg-red-100 text-red-800 p-2 rounded');
     }
 });

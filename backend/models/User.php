@@ -63,6 +63,19 @@ class User extends BaseModel
 
         return [
             'username' => $user['username'],
+            'stats' => [
+                'd20_for' => (int)$user['d20_for'],
+                'd20_des' => (int)$user['d20_des'],
+                'd20_cos' => (int)$user['d20_cos'],
+                'd20_int' => (int)$user['d20_int'],
+                'd20_sag' => (int)$user['d20_sag'],
+                'd20_car' => (int)$user['d20_car'],
+            ],
+            'biotic' => [
+                'hunger'  => (float)$user['hunger'],
+                'thirst'  => (float)$user['thirst'],
+                'stamina' => (float)$user['stamina'],
+            ],
             'skills' => $skills,
             'trait' => $trait
         ];

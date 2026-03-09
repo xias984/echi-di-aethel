@@ -1,0 +1,142 @@
+<!-- Nexus Lab View Content -->
+<div id="lab-page-content" class="bg-[#FDFBF8] text-[#402E32] p-6 rounded-lg border-2 border-[#A67B5B] shadow-lg">
+    <div id="lab-message" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+    <div class="flex justify-between items-center mb-6 border-b-2 border-[#A67B5B] pb-3">
+        <h2 class="text-3xl font-bold text-[#402E32] uppercase tracking-wider" style="font-family: 'Cinzel', serif;">
+            Nexus Lab
+        </h2>
+        <div class="text-right">
+            <span class="text-sm text-[#6F4E37] block">Ricercatore Autorizzato:</span>
+            <span id="lab-researcher-name" class="text-lg font-bold text-[#A67B5B]"
+                style="font-family: 'Cinzel', serif;"></span>
+        </div>
+    </div>
+
+    <!-- Synthesis Console -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Left Column: Inputs -->
+        <div class="bg-[#EAE0D5] p-5 rounded-lg border-2 border-[#A67B5B] shadow-inner">
+            <h3 class="text-xl font-bold text-[#402E32] mb-4 uppercase" style="font-family: 'Cinzel', serif;">
+                Parametri Sintesi</h3>
+
+            <!-- Ingredients -->
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-semibold text-[#6F4E37] mb-1">Ingrediente Primario [A]</label>
+                    <select id="ingredient-a"
+                        class="w-full bg-[#FDFBF8] border-2 border-[#A67B5B] text-[#402E32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#8C6239] transition-colors shadow-sm"
+                        style="font-family: 'Inter', sans-serif;">
+                        <option value="">-- Seleziona Asset --</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-[#6F4E37] mb-1">Ingrediente Reagente [B]</label>
+                    <select id="ingredient-b"
+                        class="w-full bg-[#FDFBF8] border-2 border-[#A67B5B] text-[#402E32] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[#8C6239] transition-colors shadow-sm"
+                        style="font-family: 'Inter', sans-serif;">
+                        <option value="">-- Seleziona Asset --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sliders -->
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <label class="text-sm font-semibold text-[#6F4E37]">Temperatura Termodinamica</label>
+                        <span id="temp-val" class="font-bold text-[#8C6239]"
+                            style="font-family: 'Inter', sans-serif;">20 °C</span>
+                    </div>
+                    <input type="range" id="slider-temp" min="-273" max="5000" value="20"
+                        class="w-full h-2 bg-[#D3C5B6] rounded-lg appearance-none cursor-pointer accent-[#8C6239]">
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <label class="text-sm font-semibold text-[#6F4E37]">Pressione Atmosferica</label>
+                        <span id="press-val" class="font-bold text-[#8C6239]"
+                            style="font-family: 'Inter', sans-serif;">1.0 atm</span>
+                    </div>
+                    <input type="range" id="slider-press" min="0" max="10000" value="1" step="0.5"
+                        class="w-full h-2 bg-[#D3C5B6] rounded-lg appearance-none cursor-pointer accent-[#8C6239]">
+                </div>
+            </div>
+
+            <button id="btn-synthesize"
+                class="w-full mt-8 bg-[#A67B5B] hover:bg-[#8C6239] text-white font-bold py-3 rounded-md transition-colors uppercase shadow-md"
+                style="font-family: 'Cinzel', serif;">
+                Avvia Sintesi
+            </button>
+        </div>
+
+        <!-- Right Column: Results & Roll -->
+        <div
+            class="bg-[#FDFBF8] p-5 rounded-lg border-2 border-[#A67B5B] flex flex-col items-center justify-center min-h-[400px] relative shadow-inner">
+
+            <!-- Idle State -->
+            <div id="lab-idle-state" class="text-center opacity-70">
+                <div class="text-6xl mb-4 text-[#A67B5B]">⚖️</div>
+                <p class="text-[#6F4E37] font-semibold" style="font-family: 'Inter', sans-serif;">In attesa di
+                    reagenti...</p>
+            </div>
+
+            <!-- Loading State -->
+            <div id="lab-loading-state" class="hidden text-center w-full">
+                <div class="animate-pulse flex flex-col items-center">
+                    <div
+                        class="w-16 h-16 border-4 border-t-[#A67B5B] border-r-[#8C6239] border-b-[#6F4E37] border-l-transparent rounded-full animate-spin mb-4">
+                    </div>
+                    <h3 class="text-xl font-bold text-[#6F4E37] uppercase tracking-widest"
+                        style="font-family: 'Cinzel', serif;">Analisi alchemica in corso...</h3>
+                    <div class="w-full bg-[#EAE0D5] h-2 mt-4 rounded overflow-hidden">
+                        <div class="bg-[#A67B5B] h-full w-full origin-left animate-[scaleX_2s_ease-in-out_infinite]">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result State (Hidden by default, used for animation before modal) -->
+            <div id="lab-roll-container" class="hidden text-center">
+                <h4 class="text-sm text-[#6F4E37] mb-2 uppercase font-bold">Validazione Formula</h4>
+                <div id="d20-roll-display" class="text-7xl font-bold text-[#8C6239] drop-shadow-md mb-2"
+                    style="font-family: 'Cinzel', serif;">
+                    --
+                </div>
+                <div id="d20-rank-display" class="text-2xl font-bold text-[#A67B5B]"
+                    style="font-family: 'Cinzel', serif;"></div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes scaleX {
+        0% {
+            transform: scaleX(0);
+        }
+
+        50% {
+            transform: scaleX(1);
+        }
+
+        100% {
+            transform: scaleX(0);
+        }
+    }
+
+    input[type=range] {
+        -webkit-appearance: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: currentColor;
+        cursor: pointer;
+    }
+</style>

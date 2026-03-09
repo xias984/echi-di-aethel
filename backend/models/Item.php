@@ -76,6 +76,39 @@ class Item extends BaseModel
     }
 
     /**
+     * Verifica che l'utente possieda un item specifico.
+     * Poiché ogni item_id è unico, quantity > 1 non è supportato a livello schema.
+     */
+    public function checkItemQuantity($user_id, $item_id, $quantity)
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT COUNT(*) FROM {$this->table} WHERE item_id = ? AND owner_id = ?"
+        );
+        $stmt->execute([$item_id, $user_id]);
+        return (int)$stmt->fetchColumn() >= 1;
+    }
+
+    /**
+     * Trasferisce la ownership di un item.
+     * $delta < 0 → rimuove l'item dall'utente (owner_id = NULL)
+     * $delta > 0 → assegna l'item all'utente
+     */
+    public function updateInventory($user_id, $item_id, $delta)
+    {
+        if ($delta < 0) {
+            $stmt = $this->pdo->prepare(
+                "UPDATE {$this->table} SET owner_id = NULL WHERE item_id = ? AND owner_id = ?"
+            );
+            $stmt->execute([$item_id, $user_id]);
+        } else {
+            $stmt = $this->pdo->prepare(
+                "UPDATE {$this->table} SET owner_id = ? WHERE item_id = ?"
+            );
+            $stmt->execute([$user_id, $item_id]);
+        }
+    }
+
+    /**
      * Recupera le ID delle skill genitrici/figlie compatibili con una data skill.
      * Utile per verificare l'equipaggiamento e l'uso delle skill.
      * @param int $skill_id L'ID della skill di riferimento.

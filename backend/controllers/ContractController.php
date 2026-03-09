@@ -80,15 +80,24 @@ class ContractController extends BaseController {
         }
         
         try {
+            // Prevent self-acceptance
+            $contract = $this->contractModel->findById($contract_id);
+            if (!$contract) {
+                $this->errorResponse("Contract not found.", 404);
+            }
+            if ((int)$contract['proposer_id'] === $acceptor_id) {
+                $this->errorResponse("Non puoi accettare il tuo stesso contratto.", 403);
+            }
+
             $this->contractModel->acceptContract($contract_id, $acceptor_id);
             $this->successResponse("Contract accepted successfully! Start your work.");
         } catch (Exception $e) {
             error_log("Accept Contract Error: " . $e->getMessage());
-            
+
             if (strpos($e->getMessage(), 'not available') !== false) {
                 $this->errorResponse("Contract not available.", 409);
             } else {
-                $this->errorResponse("Error accepting contract: " . $e->getMessage(), 500);
+                $this->errorResponse("Errore durante l'accettazione del contratto.", 500);
             }
         }
     }

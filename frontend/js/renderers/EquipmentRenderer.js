@@ -67,9 +67,9 @@ class EquipmentRenderer {
         } else {
             resourcesData.forEach(resource => {
                 html += `
-                    <div class="p-3 border-2 border-[#A67B5B] rounded-lg bg-[#FDFBF8] shadow-sm">
+                    <div class="flex justify-between items-center p-3 border-2 border-[#A67B5B] rounded-lg bg-[#FDFBF8] shadow-sm">
                         <strong class="text-[#402E32]">${resource.name}</strong>
-                        <span class="text-xs text-[#6F4E37]">${resource.quantity} ${resource.base_resource_type}</span>
+                        <span class="text-xs font-semibold text-[#6F4E37] bg-[#EAE0D5] px-2 py-1 rounded">Qtà: ${resource.quantity}</span>
                     </div>
                 `;
             });

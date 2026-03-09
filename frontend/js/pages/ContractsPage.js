@@ -51,8 +51,8 @@ class ContractsPage {
 
         this.currentChatContractId = contractId;
 
-        // Determina il nome utente del partner (semplificazione, potrebbe richiedere un'altra chiamta API per il nome)
-        const partnerName = userId == proposerId ? 'Proponente (tu)' : 'Accettatore (tu)'; // Simplificato
+        // Se sei il proponente, il partner è l'accettatore e viceversa
+        const partnerName = userId == proposerId ? 'Accettatore' : 'Proponente (tu)';
 
         $('#chat-modal').removeClass('hidden');
         $('#chat-contract-id').text(contractId);
@@ -144,8 +144,6 @@ class ContractsPage {
         if (!userId) return;
 
         const contractId = $(event.currentTarget).data('contract-id');
-        if (!confirm("Sei sicuro di voler accettare questo contratto?")) return;
-
         this.messages.setMessage('contract-message', 'Accettazione in corso...', 'loading');
 
         try {
@@ -162,14 +160,7 @@ class ContractsPage {
         if (!userId) return;
 
         const contractId = $(event.currentTarget).data('contract-id');
-
-        // Per l'MVP, assumiamo che i contratti siano statici e richiedono 10x Tronco Greggio
-        const requiredItems = [{ item_id: 1, quantity: 10, name: 'Tronco Greggio' }]; // item_id 1 = Tronco Greggio
-
-        if (!confirm(`Sei sicuro di voler consegnare le risorse per il contratto #${contractId}? Questa azione trasferirà ${requiredItems[0].quantity}x ${requiredItems[0].name} al proponente.`)) {
-            return;
-        }
-
+        const requiredItems = [{ item_id: 1, quantity: 10, name: 'Tronco Greggio' }]; // MVP placeholder
         this.messages.setMessage('contract-message', 'Verifica inventario e consegna in corso...', 'loading');
 
         try {
@@ -191,11 +182,6 @@ class ContractsPage {
         if (!userId) return;
 
         const contractId = $(event.currentTarget).data('contract-id');
-
-        if (!confirm(`Sei sicuro di voler completare il servizio per il contratto #${contractId}?`)) {
-            return;
-        }
-
         this.messages.setMessage('contract-message', 'Completamento servizio in corso...', 'loading');
 
         try {
@@ -211,9 +197,29 @@ class ContractsPage {
         const userId = this.state.getUserId();
         if (!userId) return;
 
+        // Assicura che il polling precedente sia fermo se si rientra nella pagina
+        if (this.chatInterval) {
+            clearInterval(this.chatInterval);
+            this.chatInterval = null;
+        }
         $('#chat-modal').addClass('hidden');
 
         this.loadContracts();
+        this.loadSkillsForDropdown();
+    }
+
+    async loadSkillsForDropdown() {
+        try {
+            const response = await this.api.getAdminSkills();
+            const skills = response.skills || [];
+            const select = $('#required-skill-name');
+            select.empty().append('<option value="">Seleziona Mestiere Richiesto</option>');
+            skills.forEach(skill => {
+                select.append(`<option value="${skill.name}">${skill.name}</option>`);
+            });
+        } catch (e) {
+            console.error('Impossibile caricare le skill per il form contratti:', e);
+        }
     }
 }
 
