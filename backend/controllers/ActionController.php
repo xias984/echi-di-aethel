@@ -59,9 +59,9 @@ class ActionController extends BaseController
         $data = $this->getJsonInput();
         $this->validateRequired($data, ['user_id', 'ingredients', 'params']);
 
-        $userId = (int)($data['user_id'] ?? 0);
+        $userId      = (int)($data['user_id'] ?? 0);
         $ingredients = $data['ingredients'] ?? [];
-        $params = $data['params'] ?? [];
+        $params      = $data['params'] ?? [];
 
         if (!$userId || empty($ingredients)) {
             $this->errorResponse("User ID and Ingredients are required.");
@@ -76,26 +76,21 @@ class ActionController extends BaseController
             require_once __DIR__ . '/../logic/DiceEngine.php';
             $diceEngine = new DiceEngine($this->pdo);
 
-            // DC 10 per sintesi base; skill bonus 0 (alchimia non ancora implementata come skill separata)
-            $rollData = $diceEngine->roll($userId, 'int', 0, 10);
+            $rollData  = $diceEngine->roll($userId, 'int', 0, 10);
             $totalRoll = $rollData['total'];
-            $rawRoll = $rollData['roll'];
+            $rawRoll   = $rollData['roll'];
 
             // Mappa il risultato totale al rank di sintesi
             $rank = 'D';
-            if ($totalRoll >= 20)
-                $rank = 'S';
-            elseif ($totalRoll >= 16)
-                $rank = 'A';
-            elseif ($totalRoll >= 11)
-                $rank = 'B';
-            elseif ($totalRoll >= 6)
-                $rank = 'C';
+            if ($totalRoll >= 20)      $rank = 'S';
+            elseif ($totalRoll >= 16)  $rank = 'A';
+            elseif ($totalRoll >= 11)  $rank = 'B';
+            elseif ($totalRoll >= 6)   $rank = 'C';
 
             $rollResultData = [
                 'total' => $totalRoll,
-                'raw' => $rawRoll,
-                'rank' => $rank
+                'raw'   => $rawRoll,
+                'rank'  => $rank
             ];
 
             // 2. Chiama l'IA per sintetizzare e registrare
@@ -108,9 +103,26 @@ class ActionController extends BaseController
                 $this->errorResponse("Errore sintesi: " . $synthesisData['message'], 500);
             }
 
+            // 3. Assegna XP a "Fabbricazione Base" in base al rank ottenuto
+            //    Solo per sintesi andate a buon fine (new o escalated)
+            $xpResult = null;
+            if (in_array($synthesisData['status'], ['new', 'escalated'])) {
+                $xpByRank = ['D' => 50, 'C' => 100, 'B' => 200, 'A' => 400, 'S' => 800];
+                $xpAmount = $xpByRank[$rank] ?? 50;
+
+                require_once __DIR__ . '/../models/Skill.php';
+                $skillModel  = new Skill($this->pdo);
+                $skillId     = $skillModel->findIdByName('Fabbricazione Base');
+
+                if ($skillId) {
+                    $xpResult = $skillModel->addXP($userId, $skillId, $xpAmount);
+                }
+            }
+
             $this->successResponse("Sintesi completata.", [
                 'synthesisResult' => $synthesisData,
-                'rollResult' => $rollResultData
+                'rollResult'      => $rollResultData,
+                'xpResult'        => $xpResult,
             ]);
         }
         catch (Exception $e) {

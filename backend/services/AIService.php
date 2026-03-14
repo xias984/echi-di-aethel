@@ -38,9 +38,11 @@ class AIService
         $prompt .= "Istruzioni Rigorose:\n";
         $prompt .= "1. Valuta la combinazione per determinare il nome del nuovo brevetto.\n";
         $prompt .= "2. Genera i modificatori basati su 10 costanti universali di gioco (es. Vigor, Potency, Integrity, ecc.).\n";
-        $prompt .= "3. NON includere testo aggiuntivo, markdown o blocchi di codice nella tua risposta.\n";
-        $prompt .= "4. Devi rispondere ESCLUSIVAMENTE con un JSON valido strutturato così:\n";
-        $prompt .= "{\n  \"name\": \"Nome del Brevetto\",\n  \"modifiers\": {\n    \"Vigor\": 2,\n    \"Potency\": 1\n  }\n}";
+        $prompt .= "3. Stima il valore di mercato base in Aethel Gold (base_value, numero decimale > 0).\n";
+        $prompt .= "4. Stima il peso fisico dell'asset sintetizzato in chilogrammi (weight_kg, numero decimale > 0).\n";
+        $prompt .= "5. NON includere testo aggiuntivo, markdown o blocchi di codice nella tua risposta.\n";
+        $prompt .= "6. Devi rispondere ESCLUSIVAMENTE con un JSON valido strutturato così:\n";
+        $prompt .= "{\n  \"name\": \"Nome del Brevetto\",\n  \"modifiers\": {\n    \"Vigor\": 2,\n    \"Potency\": 1\n  },\n  \"base_value\": 125.50,\n  \"weight_kg\": 0.350\n}";
 
         return $prompt;
     }
@@ -89,15 +91,17 @@ class AIService
             $newRankValue = $this->getRankValue($rollResult);
 
             if ($newRankValue > $existingRankValue) {
-                // Aggiorna l'owner e il Rank del Blueprint
+                // Aggiorna owner, rank e tier del Blueprint
                 $this->blueprintModel->update($existingBlueprint['id'], [
                     'owner_id' => $userId,
-                    'rank' => $rollResult
+                    'rank'     => $rollResult,
+                    'tier'     => $newRankValue,   // RANK_VALUES già mappa rank → 1-5
                 ]);
 
                 // Ricava i dati aggiornati
                 $existingBlueprint['owner_id'] = $userId;
-                $existingBlueprint['rank'] = $rollResult;
+                $existingBlueprint['rank']     = $rollResult;
+                $existingBlueprint['tier']     = $newRankValue;
 
                 return [
                     'status' => 'escalated',
@@ -126,16 +130,22 @@ class AIService
         }
 
         $blueprintData = [
-            'hash' => $hash,
-            'name' => $aiResponse['name'],
-            'rank' => $rollResult,
-            'owner_id' => $userId,
-            'modifiers' => json_encode($aiResponse['modifiers'] ?? []),
-            'royalty_rate' => 5.00 // Default, come da specifiche
+            'hash'         => $hash,
+            'name'         => $aiResponse['name'],
+            'rank'         => $rollResult,
+            'owner_id'     => $userId,
+            'modifiers'    => $aiResponse['modifiers'] ?? [],
+            'royalty_rate' => 5.00,
+            'base_value'   => is_numeric($aiResponse['base_value'] ?? null)
+                                  ? round((float) $aiResponse['base_value'], 2)
+                                  : 0.00,
+            'weight_kg'    => is_numeric($aiResponse['weight_kg'] ?? null)
+                                  ? round((float) $aiResponse['weight_kg'], 3)
+                                  : 0.000,
         ];
 
-        $blueprintId = $this->blueprintModel->insert($blueprintData);
-        $blueprintData['id'] = $blueprintId;
+        $blueprintId = $this->blueprintModel->create($blueprintData);
+        $blueprintData['id']        = $blueprintId;
         $blueprintData['modifiers'] = $aiResponse['modifiers'] ?? []; // decoded per il return
 
         return [
