@@ -94,10 +94,12 @@ class ActionController extends BaseController
             ];
 
             // 2. Chiama l'IA per sintetizzare e registrare
+            $synthesisSkill = 'Fabbricazione Base';
+
             require_once __DIR__ . '/../services/AIService.php';
             $aiService = new AIService($this->pdo);
 
-            $synthesisData = $aiService->processSynthesis($userId, $ingredients, $params, $rank);
+            $synthesisData = $aiService->processSynthesis($userId, $ingredients, $params, $rank, $synthesisSkill);
 
             if ($synthesisData['status'] === 'error') {
                 $this->errorResponse("Errore sintesi: " . $synthesisData['message'], 500);
@@ -112,7 +114,7 @@ class ActionController extends BaseController
 
                 require_once __DIR__ . '/../models/Skill.php';
                 $skillModel  = new Skill($this->pdo);
-                $skillId     = $skillModel->findIdByName('Fabbricazione Base');
+                $skillId     = $skillModel->findIdByName($synthesisSkill);
 
                 if ($skillId) {
                     $xpResult = $skillModel->addXP($userId, $skillId, $xpAmount);
