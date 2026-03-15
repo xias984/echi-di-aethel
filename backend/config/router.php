@@ -46,6 +46,10 @@ class Router
         $this->routes['PUT']['/api/admin/skills/{id}'] = ['SkillController', 'updateSkill'];
         $this->routes['DELETE']['/api/admin/skills/{id}'] = ['SkillController', 'deleteSkill'];
 
+        // Map routes
+        $this->routes['GET']['/api/map/tiles']   = ['MapController', 'getTiles'];
+        $this->routes['POST']['/api/map/observe'] = ['MapController', 'observeTile'];
+
         // Chat routes
         $this->routes['POST']['/api/chat/{id}'] = ['ChatController', 'sendMessage'];
         $this->routes['POST']['/api/chat/{id}/messages'] = ['ChatController', 'getMessages'];

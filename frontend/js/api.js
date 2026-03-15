@@ -134,6 +134,15 @@ class ApiManager {
         return this.call(`/admin/contracts/${contractId}`, 'DELETE', { admin_id: adminId });
     }
 
+    // Map methods
+    getMapTiles(userId) {
+        return this.call(`/map/tiles?user_id=${userId}`, 'GET');
+    }
+
+    observeTile(userId, x, y) {
+        return this.call('/map/observe', 'POST', { user_id: userId, x, y });
+    }
+
     // Admin Skill methods
     getAdminSkills() {
         return this.call('/admin/skills', 'GET');

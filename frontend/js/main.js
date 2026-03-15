@@ -16,6 +16,7 @@ class App {
             const contractsRenderer = new ContractsRenderer();
             const adminRenderer = new AdminRenderer();
             const labRenderer = new LabRenderer();
+            const mapRenderer = new MapRenderer();
 
             // Inizializza le pagine
             this.authPage = new AuthPage(this.api, this.state, this.messages, this.router, adminRenderer);
@@ -23,6 +24,7 @@ class App {
             this.contractsPage = new ContractsPage(this.api, this.state, this.messages, contractsRenderer);
             this.adminPage = new AdminPage(this.api, this.state, this.messages, adminRenderer);
             this.labPage = new LabPage(this.api, this.state, this.messages, labRenderer);
+            this.mapPage = new MapPage(this.api, this.state, this.messages, mapRenderer);
 
             // Registra le pagine nel router
             this.router.registerPage('auth', this.authPage);
@@ -30,6 +32,7 @@ class App {
             this.router.registerPage('contracts', this.contractsPage);
             this.router.registerPage('admin', this.adminPage);
             this.router.registerPage('lab', this.labPage);
+            this.router.registerPage('map', this.mapPage);
 
             $('#admin-panel-btn').on('click', () => {
                 this.router.navigateTo('admin');
@@ -89,6 +92,9 @@ $(document).ready(() => {
         });
         $('#nav-lab-btn').on('click', () => {
             app.router.navigateTo('lab');
+        });
+        $('#nav-map-btn').on('click', () => {
+            app.router.navigateTo('map');
         });
     } catch (error) {
         console.error('Errore durante il caricamento:', error);

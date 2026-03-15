@@ -1,0 +1,166 @@
+<!-- Map View — Carta di Aethel -->
+<div id="map-page-content" class="text-[#402E32]">
+
+    <div id="map-message" class="hidden mb-4 p-3 rounded-lg text-sm"></div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-5 pb-3 border-b-2 border-[#A67B5B]">
+        <div>
+            <h2 class="text-3xl font-bold text-[#402E32] uppercase tracking-wider" style="font-family:'Cinzel',serif;">
+                Carta di Aethel
+            </h2>
+            <p class="text-sm text-[#6F4E37] mt-0.5">Esplora il mondo — usa la Saggezza per rivelare i segreti del territorio</p>
+        </div>
+        <div class="text-right text-xs text-[#8C6239]">
+            <div>Esplorazione via <strong>SAG + Pionierismo</strong></div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+
+        <!-- ── World Map SVG (3/5) ─────────────────────────────── -->
+        <div class="xl:col-span-3">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-bold text-[#6F4E37] uppercase tracking-widest" style="font-family:'Cinzel',serif;">
+                    Vista Globale
+                </h3>
+                <span class="text-xs text-[#8C6239]">Clicca un tile per selezionarlo</span>
+            </div>
+
+            <div id="world-map-wrapper"
+                 class="bg-[#0d0a06] rounded-lg border-2 border-[#3d2410] overflow-hidden shadow-2xl relative">
+                <svg id="world-map-svg"
+                     viewBox="0 0 660 420"
+                     preserveAspectRatio="xMidYMid meet"
+                     class="w-full select-none"
+                     style="max-height:440px;">
+                    <!-- Populated by MapRenderer -->
+                </svg>
+            </div>
+
+            <!-- Legend -->
+            <div id="map-legend" class="mt-3 flex flex-wrap gap-2">
+                <!-- Populated by MapRenderer -->
+            </div>
+        </div>
+
+        <!-- ── Right Panel (2/5) ─────────────────────────────── -->
+        <div class="xl:col-span-2 space-y-4">
+
+            <!-- Tile Info & Observe Panel -->
+            <div id="tile-info-panel"
+                 class="bg-[#EAE0D5] border-2 border-[#A67B5B] rounded-lg p-4 min-h-[160px]">
+
+                <!-- Idle state -->
+                <div id="tile-idle-msg"
+                     class="flex flex-col items-center justify-center h-24 text-[#6F4E37] text-sm gap-2">
+                    <span class="text-3xl opacity-40">⬡</span>
+                    <span>Seleziona un tile sulla mappa mondiale</span>
+                </div>
+
+                <!-- Tile detail (hidden until selection) -->
+                <div id="tile-detail" class="hidden">
+
+                    <!-- Top row: biome + coords + DC -->
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span id="tile-biome-badge"
+                                      class="text-xs font-bold uppercase px-2 py-0.5 rounded text-white">
+                                    biome
+                                </span>
+                                <span id="tile-revealed-badge" class="hidden text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded">
+                                    ✓ Rivelato
+                                </span>
+                            </div>
+                            <h4 id="tile-biome-name"
+                                class="text-xl font-bold text-[#402E32] capitalize mt-1"
+                                style="font-family:'Cinzel',serif;">—</h4>
+                            <span id="tile-coords" class="text-xs text-[#8C6239]"></span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-[#6F4E37] uppercase font-semibold">Difficoltà</div>
+                            <div id="tile-dc"
+                                 class="text-3xl font-bold text-[#A67B5B]"
+                                 style="font-family:'Cinzel',serif;">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Tags discovered -->
+                    <div class="mb-3">
+                        <p class="text-xs font-semibold text-[#6F4E37] uppercase mb-1.5">Tag Scoperti</p>
+                        <div id="tile-tags-list" class="flex flex-wrap gap-1.5 min-h-[24px]">
+                            <span class="text-xs text-[#8C6239] italic">Inesplorato</span>
+                        </div>
+                    </div>
+
+                    <!-- Best roll info -->
+                    <div id="tile-best-roll-row" class="hidden mb-2 text-xs text-[#6F4E37]">
+                        Miglior tiro precedente: <strong id="tile-best-roll">—</strong>
+                    </div>
+
+                    <!-- Roll animation result -->
+                    <div id="roll-result-panel"
+                         class="hidden bg-[#FDFBF8] rounded-lg p-3 mb-3 text-center border border-[#A67B5B] relative overflow-hidden">
+                        <div class="text-xs text-[#6F4E37] uppercase font-semibold mb-1">Tiro di Percezione</div>
+                        <div id="roll-anim-number"
+                             class="text-5xl font-bold text-[#8C6239] leading-none"
+                             style="font-family:'Cinzel',serif;">—</div>
+                        <div id="roll-anim-vs"
+                             class="text-xs text-[#6F4E37] mt-0.5"></div>
+                        <div id="roll-anim-grade"
+                             class="text-sm font-bold mt-2 py-1 px-3 rounded-full inline-block">—</div>
+                    </div>
+
+                    <!-- Observe button -->
+                    <button id="btn-observe-tile"
+                            class="w-full bg-[#A67B5B] hover:bg-[#8C6239] active:bg-[#6F4E37] text-white font-bold py-2.5 rounded-md transition-colors uppercase text-sm shadow-md"
+                            style="font-family:'Cinzel',serif;">
+                        ⬡ Osserva Territorio
+                    </button>
+                    <p id="observe-loading"
+                       class="hidden text-center text-xs text-[#6F4E37] mt-1.5 animate-pulse">
+                        Tiro d20 in corso...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Local Map Canvas -->
+            <div class="bg-[#120c06] border-2 border-[#3d2410] rounded-lg overflow-hidden shadow-2xl">
+                <div class="bg-[#1e1208] px-4 py-2.5 border-b border-[#3d2410] flex justify-between items-center">
+                    <h3 class="text-sm font-bold text-[#c9a96e] uppercase tracking-widest"
+                        style="font-family:'Cinzel',serif;">
+                        Vista Locale 10×10
+                    </h3>
+                    <span id="local-map-label" class="text-xs text-[#6F4E37]">—</span>
+                </div>
+                <div class="p-2">
+                    <canvas id="local-map-canvas"
+                            width="400" height="400"
+                            class="w-full rounded block">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+#world-map-svg .iso-tile {
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+#world-map-svg .iso-tile:hover .tile-base {
+    filter: brightness(1.25);
+}
+#world-map-svg .iso-tile.selected .tile-select-ring {
+    stroke-opacity: 1 !important;
+}
+@keyframes roll-pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+.roll-pulse { animation: roll-pulse 0.25s ease-in-out; }
+</style>
